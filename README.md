@@ -38,7 +38,7 @@
 
 ### 서비스 구성도
 
-![중고모아_아키텍처.PNG](C:\Users\mark146\Desktop\포폴 사진들\중고모아_아키텍처.PNG)
+![중고모아_아키텍처](https://user-images.githubusercontent.com/24368929/138834802-d46aa00f-15ed-458e-9ed1-b0db72f60874.PNG)
 
 ### 주요 기능
 - 로그인 / 회원가입 : 로그인 API를 사용한 JWT 방식의 로그인
