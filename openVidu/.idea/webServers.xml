@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="d544a3f0-b8b6-4803-b12f-ae7574ef60a0" name="openvidu">
+        <fileTransfer rootFolder="/usr/local/openvidu/openvidu-tutorials/openvidu-recording-node" accessType="SFTP" host="3.37.98.196" port="22" sshConfigId="e8816814-8443-480c-991e-ea676d390056" sshConfig="master@3.37.98.196:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

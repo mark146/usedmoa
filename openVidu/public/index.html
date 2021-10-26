@@ -1,0 +1,55 @@
+<html>
+
+<!-- 녹음 기능이 있는 템플릿 -->
+<head>
+	<title>openvidu-recording-node</title>
+
+	<meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8">
+	<link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon">
+
+	<!-- Bootstrap -->
+	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+			integrity="sha256-k2WSCIexGzOj3Euiig+TlR8gA0EmPjuc79OEeY5L45g=" crossorigin="anonymous"></script>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+		  integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+			integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+			crossorigin="anonymous"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<!-- Bootstrap -->
+
+	<link rel="styleSheet" href="style.css" type="text/css" media="screen">
+	<script src="openvidu-browser-2.20.0.js"></script>
+	<script src="app.js"></script>
+	<script>
+		$(document).ready(function () {
+			$('[data-toggle="tooltip"]').tooltip({
+				html: true
+			});
+		});
+	</script>
+</head>
+
+<body>
+
+<div id="container main-container" class="container">
+	<input type="hidden" name="" id="join" value="">
+
+   <div id="session" > <!-- style="display: none" -->
+	   <div class="row">
+		   <div id="video-container" class="col-md-12"></div>
+	   </div>
+
+		<div id="session-header">
+			<h1 id="session-title"></h1>
+<!--			<input class="btn btn-sm btn-danger" type="button" id="buttonCloseSession" onmouseup="closeSession()" value="Close session">-->
+			<input class="btn btn-sm btn-danger" type="button" id="buttonLeaveSession" onmouseup="removeUser(); leaveSession()" value="나가기">
+			<input class="btn btn-sm btn-success" type="button" id="join-btn" onclick="joinSession()"  value="접속">
+			<input type="hidden" id="create_user" name="create_user" value="">
+			<input type="hidden" id="board_id" name="board_id" value="">
+		</div>
+	</div>
+</div>
+</body>
+
+</html>
