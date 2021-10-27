@@ -15,6 +15,6 @@ server.use(router)
 
 
 // 서버 포트 오픈
-server.listen(process.env.serverPort, () => {
+server.listen(process.env.SERVER_PORT, () => {
     console.log('Server is running on port 3000')
 })
