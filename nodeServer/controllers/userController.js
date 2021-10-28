@@ -2,8 +2,6 @@ const dotenv = require('dotenv').config()
 const {userService} = require('../services')
 const {auth} = require('../middlewares')
 const AWS = require("aws-sdk");
-const uuid = require("uuid");
-const fs = require('fs');
 require('date-utils')
 
 
@@ -155,7 +153,6 @@ const tokenAmount = async (req, res, next) => {
 
 
 // 유저 거래내역 조회
-// userTradeHistory(wallets[0].address);
 const tradeHistory = async (req, res, next) => {
   try {
     let accessToken = "";
@@ -189,8 +186,6 @@ const tradeHistory = async (req, res, next) => {
     res.status(500).json({ error: err.message });
   }
 }
-
-
 
 
 module.exports = {
