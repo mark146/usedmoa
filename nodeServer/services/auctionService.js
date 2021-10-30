@@ -7,7 +7,6 @@ const fs = require("fs");
 const formData = require("form-data");
 const path = require('path');
 const Web3 = require('web3');
-const Tx = require('ethereumjs-tx').Transaction;
 const moment = require('moment').tz.setDefault("Asia/Seoul"); // TODO 시간 처리 부분 다시 공부 -> dayjs
 const web3js = new Web3(
     new Web3.providers.HttpProvider('https://ropsten.infura.io/v3/' + process.env.INFURA_KEY)
@@ -192,12 +191,10 @@ const auctionDetail = async (auctionId) => {
     const uri = await getAuctionUri(auctionId);
     const words = uri.split('/');
     const filePath = "/usr/local/nodejs/"+words[3]+"/"+words[4];
-    //
-    // // json 파일 -> json 객체 변환
+
+    // json 파일 -> json 객체 변환
     const jsonFile = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
     console.info("jsonFile: ",jsonFile);
-
-
 
 
     // 상품명, 설명, 상품 이미지 정보, 경매 진행상황, 최고 입찰자, 최고 입찰가, 종료 시간
@@ -213,7 +210,6 @@ const auctionBid = async (auctionId, userAdress, bidPrice) => {
     console.info("auctionBid 실행");
     // await this.instance.connect(wallets[1]).bid(this.auctionId_v2, 20);
 
-    // 
     const master_tokenInfo = await getUserTokenInfo(process.env.TOKEN_MASTER_ADDRESS);
     console.log("master_tokenInfo: ",master_tokenInfo);
 
@@ -255,6 +251,7 @@ const auctionEnd = async (auctionId) => {
 
 
 /* ############################################## */
+
 
 // 테스트용 토큰 발급
 const userTokenMint = async () => {
@@ -441,7 +438,6 @@ const auctionRegister = async (play_time, user_address, product_price) => {
         .on("error: ", console.error)
 }
 
-
 // 블록체인에 경매 입찰 등록
 const sendAuctionBid = async (auctionId, userAdress, price) => {
 
@@ -478,7 +474,6 @@ const sendAuctionBid = async (auctionId, userAdress, price) => {
         .on("error: ", console.error)
 }
 
-
 // 블록체인에 경매 종료
 const sendAuctionEnd = async (auctionId) => {
 
@@ -510,189 +505,6 @@ const sendAuctionEnd = async (auctionId) => {
         })
         .on("error: ", console.error)
 }
-
-
-// Web3.js는 내부적으로 HTTP 나 IPC를 통해 JSON RPC API를 호출 하도록 되어있다
-/*
-const erc1155Send = async () => {
-    console.log("거래 전 토큰 정보");
-
-    // erc 1155 방식 v1
-    const from = web3js.utils.toChecksumAddress(token_master);
-    const to = web3js.utils.toChecksumAddress(address);
-    const erc1155TokenAddress = web3js.utils.toChecksumAddress(process.env.ERC1155_CONTRACT_ADDRESS);
-
-    // ether 단위 정보 - 참고 : https://web3js.readthedocs.io/en/v1.5.2/web3-utils.html?highlight=toHex#tohex
-    const amount = web3js.utils.toWei('220', 'wei');
-
-    const chainId = await web3js.eth.getChainId();
-
-    // 개인 키로 거래에 서명
-    const signedTx  = await web3js.eth.accounts.signTransaction({
-        "to": erc1155TokenAddress,  // 거래가 전송되는 계정, 비어 있으면 거래가 계약을 생성
-        "gas": 91712,
-        "chainId": chainId,
-        "value":"0x0",
-        "data": contract.methods.sendToken(from, to, 0, amount).encodeABI()
-    }, token_master_pk)
-    console.log("signedTx : ",signedTx.rawTransaction);
-
-    // 트랜잭션 전송
-    web3js.eth.sendSignedTransaction(signedTx.rawTransaction)
-        .once("transactionHash", hash => {
-            // tx가 pending되는 즉시 etherscan에서 tx진행상태를 보여주는 링크를 제공
-            console.info("transactionHash: ", "https://ropsten.etherscan.io/tx/" + hash)
-        })
-        .once("receipt", receipt => {
-            console.log("거래 후 토큰 정보");
-            contract.methods.getBalance(token_master, 0).call().then(function(str) {
-                console.log("token_master.getBalance(): ",str);
-            });
-            contract.methods.getBalance(address, 0).call().then(function(str) {
-                console.log("address.getBalance(): ",str);
-            });
-        })
-        .on("error: ", console.error)
-}
-
-
-const erc20Send = async () => {
-    // const chainId = await web3js.eth.getChainId();
-    // console.log("거래 전 토큰 정보");
-    // await contract.methods.getBalance(token_master).call().then(function(str) {
-    //     console.log("token_master.getBalance(): ",str);
-    // });
-    // await contract.methods.getBalance(address).call().then(function(str) {
-    //     console.log("address.getBalance(): ",str);
-    // });
-    //
-    // // ERC20 토큰 전송
-    // const from = web3js.utils.toChecksumAddress(token_master);
-    // const to = web3js.utils.toChecksumAddress(address);
-    // const erc20TokenAddress = web3js.utils.toChecksumAddress(erc20ContractAddress);
-    // const amount = web3js.utils.toWei('220', 'ether');
-    //
-    // // 개인 키로 거래에 서명
-    // const signedTx  = await web3js.eth.accounts.signTransaction({
-    //     "to": erc20TokenAddress,  // 거래가 전송되는 계정, 비어 있으면 거래가 계약을 생성
-    //     "gas": 41712,
-    //     "chainId": chainId,
-    //     "value":"0x0",
-    //     "data": contract.methods.transfer(to, amount).encodeABI()
-    // }, token_master_pk)
-    // console.log("signedTx : ",signedTx.rawTransaction);
-    //
-    // // 트랜잭션 전송
-    // web3js.eth.sendSignedTransaction(signedTx.rawTransaction)
-    //     .once("transactionHash", hash => {
-    //         // tx가 pending되는 즉시 etherscan에서 tx진행상태를 보여주는 링크를 제공
-    //         console.info("transactionHash: ", "https://ropsten.etherscan.io/tx/" + hash)
-    //     })
-    //     .once("receipt", receipt => {
-    //         console.log("거래 후 토큰 정보");
-    //         contract.methods.getBalance(token_master).call().then(function(str) {
-    //             console.log("token_master.getBalance(): ",str);
-    //         });
-    //         contract.methods.getBalance(address).call().then(function(str) {
-    //             console.log("address.getBalance(): ",str);
-    //         });
-    //     })
-    //     .on("error: ", console.error)
-}
-
-// 파일 ipfs 업로드하는 함수
-const ipfsUpload = async (req, res, next) => {
-    try {
-        // console.log("req: ",req);
-
-        // (시나리오) 1. 이미지 ipfs 저장 후 경로 호출 -> 2. json 파일 생성 -> 3. nft 생성
-
-
-        // 1. 이미지 ipfs 저장 후 경로 호출
-        // pinFileToIPFS
-
-
-        // 2. 메타데이터 정보가 담긴 json 파일 생성
-
-         // 메타데이터 구조
-         // "id": 0,
-         // "name": "Asset Name", // 콘텐츠명(작품명)
-         // "image" (이미지) :  "ipfs://YOUR_ASSET_CID" // NFT의 디지털 자산에 대한 링크인 문자열
-         // "description": "description...", // NFT의 설명을 저장하는 문자열
-         // "properties": { //  { 구매자, 가격 }
-         //    "creator": "creator name", // 창작자명
-         //    "create_date": "2020-05-20", // 등록일자
-         //    "total_token": "5", // 총 복제 수량
-         //    "file_name": "myContent.dat", // 콘텐츠 파일명
-         //    walletAddress - 사용자의 지갑 주소를 저장하는 문자열
-         //    status- UI 하단에 표시할 메시지가 포함된 문자열
-         // }
-
-const attributesJson = `{ "creator" : "creator name", "create_date" : "2020-05-20", "total_token" : "5", "file_name" : "myContent.dat" }` ;
-
-let metaDataInfo = new Map();
-metaDataInfo.set("name", "Asset Name");
-metaDataInfo.set("image", "ipfs://YOUR_ASSET_CID");
-metaDataInfo.set("description", "description");
-metaDataInfo.set("attributes", attributesJson);
-
-// map -> Json 변환
-// 참고 : https://velog.io/@kwonh/ES6-%EB%8D%B0%EC%9D%B4%ED%84%B0%EC%BB%AC%EB%A0%89%EC%85%984-Map%EC%9C%BC%EB%A1%9C-%EA%B0%9D%EC%B2%B4-%EB%8C%80%EC%8B%A0%ED%95%98%EA%B8%B0
-const modified = [...metaDataInfo]
-const reducerApplied = modified.reduce((accum,current)=>{
-    return {
-        ...accum,
-        [current[0]]:current[1]
-    }
-},{})
-console.log("reducerApplied: ", reducerApplied);
-let json = JSON.stringify(reducerApplied);
-
-let isId = 2;
-
-// 비동기방식으로 json 파일 저장 (writeFile, createWriteStream, writeFileSync)
-fs.writeFile(`./json/${isId}.json`, json, 'utf8', (err) => {
-    if (err) throw err;
-    console.log('The file has been saved!');
-    let data2 = fs.readFileSync(`./json/${isId}.json`,'utf-8');
-    console.log('data2: ',data2);
-
-
-
-    // const resilt = await fs.writeFile('./json/myjsonfile.json', json);
-    //  console.log("resilt: ", resilt);
-    // IPFS 서버에 json 파일 생성
-    // const jsonResult = await pinJSONToIPFS(reducerApplied);
-    // console.log("jsonResult: ","https://ipfs.io/ipfs/"+jsonResult);
-
-    // pinFileToIPFS
-    // const jsonResult = await pinFileToIPFS(reducerApplied);
-    // console.log("jsonResult: ","https://ipfs.io/ipfs/"+jsonResult);
-
-    // json 파일 정보 조회
-    // const pinResult = await pinCheck(jsonResult);
-    // console.log("pinResult: ",pinResult);
-    // console.log("pinResult.name: ",pinResult.name);
-    // console.log("pinResult.image: ",pinResult.image);
-    // console.log("pinResult.description: ",pinResult.description);
-    // console.log("pinResult.attributes: ",pinResult.attributes);
-
-    // string -> json 변환 - 참고 : https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse
-    // const parsedData = JSON.parse(pinResult.attributes);
-    // console.log("parsedData: ",parsedData);
-
-    res.status(200).json({
-        message: 'ipfsUpload 파일 업로드 완료!'
-    })
-});
-
-} catch (err) {
-    console.err("ipfs 파일 업로드 에러 : ", err);
-}
-}
-
-*/
-
 
 
 module.exports = {

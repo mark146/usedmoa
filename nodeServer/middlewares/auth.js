@@ -52,7 +52,7 @@ const verifyJWT = async (accessToken) => {
 
     try {
         // verify(전달받은 토큰, 생성시 입력한 salt값)
-        var decode = jwt.verify(accessToken, process.env.SECRET_KEY)
+        let decode = jwt.verify(accessToken, process.env.SECRET_KEY)
         console.log(`verifyJWT - decode: ${decode}`)
 
         return decode

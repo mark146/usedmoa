@@ -4,8 +4,8 @@ const uuid = require("uuid");
 const {boardService} = require("../services");
 const {auth} = require("../middlewares");
 
-AWS.config.update({ region: process.env.Region });
 
+AWS.config.update({ region: process.env.Region });
 const S3_BUCKET = process.env.ImageBucketName;
 const s3 = new AWS.S3({
     accessKeyId: process.env.AccessKeyId,
@@ -20,20 +20,20 @@ const boardList = async (req, res, next) => {
     try {
         let accessToken = "";
         let userInfo = new Map();
-        
+
         // 회원일 경우 검증
         if(req.headers.authorization != undefined) {
-            
+
             // 값 추출
             accessToken = req.headers.authorization.split('Bearer ')[1];
             userInfo.set("accessToken", accessToken);
             console.log("accessToken: " + accessToken);
-            
+
             // jwt 값 검증
             // await Auth.verifyJWT(accessToken)
         }
-        
-        
+
+
         // 3. 글 목록 조회
         const result = await boardService.boardList(userInfo);
         // console.log(`result: `,result);
@@ -41,12 +41,16 @@ const boardList = async (req, res, next) => {
 
         // 4. 클라이언트 전달 - 새로 발급한 access token과 원래 있던 refresh token 모두 클라이언트에게 반환합니다.
         res.status(200).json({
-            message: '글 조회 완료',
+            statusCode : 200,
             list : result,
         })
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: err.message });
+        console.error("err: ",err);
+
+        res.status(500).json({
+            statusCode : 500,
+            error: err.message
+        });
     }
 }
 
@@ -92,15 +96,22 @@ const boardCreate = async (req, res, next) => {
 
             // 5. 클라이언트 전달 - 새로 발급한 access token과 원래 있던 refresh token 모두 클라이언트에게 반환합니다.
             res.status(200).json({
-                message: '글 등록 완료',
+                statusCode : 200,
                 "uploadUrl": userInfo.get("uploadUrl"),
             })
         } else {
-            res.status(401).json({ error: 'Auth Error from authorization' });
+            res.status(401).json({
+                statusCode : 401,
+                error: 'Auth Error from authorization'
+            });
         }
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: err.message });
+        console.error("err: ",err);
+
+        res.status(500).json({
+            statusCode : 500,
+            error: err.message
+        });
     }
 }
 
@@ -128,23 +139,26 @@ const getPresignedUrl = async (userInfo) => {
 
         s3.getSignedUrl("putObject", s3Params, (err, url) => {
             if (err) {
-                console.error(err);
-                return
+                console.error("err: ",err);
+
+                return res.status(500).json({
+                    statusCode : 500,
+                    error: err.message
+                });
             }
 
             userInfo.set("uploadUrl", url);
             userInfo.set("downloadUrl", `https://usedmoa.s3.amazonaws.com/image/${fileName}` + "." + fileType);
-            // const returnData = {
-            //     success: true,
-            //     message: "Url generated",
-            //     uploadUrl: url,
-            //     downloadUrl:`https://usedmoa.s3.amazonaws.com/image/${fileName}` + "." + fileType,
-            // };
 
             return userInfo;
         });
     } catch (err) {
-        console.error("err: " + err);
+        console.error("err: ",err);
+
+        res.status(500).json({
+            statusCode : 500,
+            error: err.message
+        });
     }
 }
 

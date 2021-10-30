@@ -28,10 +28,14 @@ describe("UserController Create", () => {
         expect(typeof userController.login).toBe("function");
     })
 
+    /*
+    Kakao_Login_accessToken: Gbeu-Tq75dmV17w-zhp7WEk09wTsYQxpOH5qzwo9c00AAAF80LOzFg
+    Kakao_Login_refreshToken: K_eR37RNVJPe2T_IpU76WUQeQ1__5fVw1Eyh2wo9c00AAAF80LOzFA
+    */
     // Mock 데이터 넣어주기
     beforeEach(() => {
         req.headers = {
-            "authorization" : "Bearer nTa_jcUfKnx01PH8E0Y6LW_GGeAcLc588HldLAorDR4AAAF8jOIukg"
+            "authorization" : "Bearer Gbeu-Tq75dmV17w-zhp7WEk09wTsYQxpOH5qzwo9c00AAAF80LOzFg"
         }
         req.body = {
             "email": "test"

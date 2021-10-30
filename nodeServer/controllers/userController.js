@@ -1,21 +1,7 @@
 const dotenv = require('dotenv').config()
 const {userService} = require('../services')
 const {auth} = require('../middlewares')
-const AWS = require("aws-sdk");
 require('date-utils')
-
-
-AWS.config.update({ region: process.env.Region });
-
-
-// 참고 https://ichi.pro/ko/ipfslo-erc-721-nftleul-guchughaneun-bangbeob-254443020417300
-const S3_BUCKET = process.env.VodBucketName;
-const s3 = new AWS.S3({
-  accessKeyId: process.env.AccessKeyId,
-  secretAccessKey: process.env.SecretAccessKey,
-  region: process.env.Region,
-  signatureVersion: "v4"
-});
 
 
 // 로그인 & 회원가입
@@ -61,17 +47,25 @@ const login = async (req, res, next) => {
         res.setHeader("accessToken", userInfo.get("accessToken"))
         res.setHeader("refreshToken", userInfo.get("refreshToken"))
         res.status(200).json({
+          statusCode : 200,
           email: userInfo.get("email"),
           user_id: userInfo.get("user_id"),
           message: 'user created',
         })
       }
     } else {
-      res.status(401).json({ error: 'Auth Error from authorization' });
+      res.status(401).json({
+        statusCode : 401,
+        error: 'Auth Error from authorization'
+      });
     }
   } catch (err) {
-    next(err)
-    res.status(500).json({ error: err.message });
+    console.error("err: ",err);
+
+    res.status(500).json({
+      statusCode : 500,
+      error: err.message
+    });
   }
 }
 
@@ -84,7 +78,6 @@ const payment = async (req, res, next) => {
     userInfo.set("auctionId", req.body.auctionId);
     userInfo.set("money", req.body.money);
 
-    console.log("payment 실행");
 
     switch (req.body.userId) {
       case "master":
@@ -99,17 +92,23 @@ const payment = async (req, res, next) => {
       default:
         console.log("default: ",req.query.userId);
     }
-
     console.log("userInfo: ", userInfo)
+
 
     await userService.payment(userInfo);
 
+
     res.status(200).json({
-      message: 'payment 실행',
+      statusCode : 200,
+      message: 'payment 실행 완료',
     })
   } catch (err) {
-    // next(err)
-    res.status(500).json({ error: err.message });
+    console.error("err: ",err);
+
+    res.status(500).json({
+      statusCode : 500,
+      error: err.message
+    });
   }
 }
 
@@ -121,7 +120,6 @@ const tokenAmount = async (req, res, next) => {
     let userInfo = new Map();
     userInfo.set("auctionId",req.query.userId);
 
-    console.log("tokenAmount 실행");
 
     switch (req.query.userId) {
       case "master":
@@ -136,18 +134,23 @@ const tokenAmount = async (req, res, next) => {
       default:
         console.log("default: ",req.query.userId);
     }
-
     console.log("userInfo: ", userInfo)
+
 
     const result = await userService.tokenAmount(userInfo)
 
+
     res.status(200).json({
-      message: 'payment 실행',
+      statusCode : 200,
       amount : result
     })
   } catch (err) {
-    // next(err)
-    res.status(500).json({ error: err.message });
+    console.error("err: ",err);
+
+    res.status(500).json({
+      statusCode : 500,
+      error: err.message
+    });
   }
 }
 
@@ -157,7 +160,7 @@ const tradeHistory = async (req, res, next) => {
   try {
     let accessToken = "";
     let userInfo = new Map();
-    console.log("tradeHistory 실행");
+
 
     switch (req.query.userId) {
       case "master":
@@ -172,18 +175,23 @@ const tradeHistory = async (req, res, next) => {
       default:
         console.log("default: ",req.query.userId);
     }
-
     console.log("userInfo: ", userInfo)
+
 
     const result = await userService.tradeHistory(userInfo);
 
+
     res.status(200).json({
-      message: 'payment 실행',
+      statusCode : 200,
       historyList : result
     })
   } catch (err) {
-    // next(err)
-    res.status(500).json({ error: err.message });
+    console.error("err: ",err);
+
+    res.status(500).json({
+      statusCode : 500,
+      error: err.message
+    });
   }
 }
 

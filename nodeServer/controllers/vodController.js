@@ -44,12 +44,16 @@ const vodList = async (req, res, next) => {
 
         // 4. 클라이언트 전달 - 새로 발급한 access token과 원래 있던 refresh token 모두 클라이언트에게 반환합니다.
         res.status(200).json({
-            message: '영상 조회 완료',
+            statusCode : 200,
             list : result,
         })
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: err.message });
+        console.error("err: ",err);
+
+        res.status(500).json({
+            statusCode : 500,
+            error: err.message
+        });
     }
 }
 
@@ -105,33 +109,34 @@ const vodUpload = async (req, res, next) => {
             };
             s3.upload(s3Params, async function (err, data) {
                 if (err) {
-                    console.error(err);
+                    console.error("s3.upload - err: ",err);
+
                     return res.status(500).json({
+                        statusCode : 500,
                         message: 'vod upload error!'
                     })
                 }
                 console.log(`data.Location: ${data.Location}`);
                 userInfo.set("video_url", data.Location);
 
-                /*
-                vodUpload - create_user:  25
-                vodUpload - board_id:  9
-                vodUpload - filePath:  /opt/openvidu/recordings/ses_ST77R45poq/ses_ST77R45poq.mp4
-                s3 파일 업로드 성공: https://usedmoa.s3.ap-northeast-2.amazonaws.com/video/ea7433f0-5f3b-4b58-b94c-6bb847d24277.mp4
-                * */
 
                 // 3. 영상통화 내용 저장
                 const response = await VodService.videoCallCreate(userInfo)
                 console.log(`s3 파일 업로드 성공: ${response}`);
 
                 res.status(200).json({
+                    statusCode : 200,
                     message: 's3 파일 업로드 완료!'
                 })
             });
         }
     } catch (err) {
-        //next(err)
-        console.err("s3 파일 업로드 에러 : ", err);
+        console.error("s3 파일 업로드 에러 : ", err);
+
+        res.status(500).json({
+            statusCode : 500,
+            error: err.message
+        });
     }
 }
 

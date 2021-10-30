@@ -1,8 +1,5 @@
 const dotenv = require('dotenv').config();
-const fs = require("fs");
 const {auctionService} = require('../services')
-const AuctionDTO = require('../dto/auctionDTO');
-
 
 
 // 경매 목록
@@ -18,18 +15,23 @@ const auctionList = async (req, res, next) => {
         // userInfo.set("content", req.body.content);
         // userInfo.set("auction_start_time", req.body.auction_start_time);
         // userInfo.set("auction_end_time", req.body.auction_end_time);
-        
+
         const result = await auctionService.auctionList();
         // console.info("result: ",result);
-        
+
+
         // 결과값 전송
         res.status(200).json({
-            message: 'auctionList 실행',
+            statusCode : 200,
             auctionList: result,
         })
     } catch (err) {
         console.error("err: ",err);
-        res.status(500).json({ error: err.message });
+
+        res.status(500).json({
+            statusCode : 500,
+            error: err.message
+        });
     }
 }
 
@@ -57,7 +59,7 @@ const auctionCreate = async (req, res, next) => {
 
         // 결과값 전송
         res.status(200).json({
-            message: 'auctionCreate 실행',
+            statusCode : 200,
             user_id : userInfo.get("user_id"),
             image_url : userInfo.get("image_url"),
             product_name : userInfo.get("product_name"),
@@ -68,7 +70,11 @@ const auctionCreate = async (req, res, next) => {
         })
     } catch (err) {
         console.error("err: ",err);
-        res.status(500).json({ error: err.message });
+
+        res.status(500).json({
+            statusCode : 500,
+            error: err.message
+        });
     }
 }
 
@@ -78,21 +84,25 @@ const auctionDetail = async (req, res, next) => {
     try {
         console.log("auctionDetail - req: ",req.query.id)
 
-        
+
         // 비즈니스 로직 처리
         // await AuctionService.auctionDetail(req.query.id);
         const result = await auctionService.auctionDetail(req.query.id);
         console.log("auctionDetail - result: ",result)
-        
-        
+
+
         // 결과값 전송
         res.status(200).json({
-            message: 'auctionDetail 실행',
+            statusCode : 200,
             auctionInfo : result
         })
     } catch (err) {
         console.error("err: ",err);
-        res.status(500).json({ error: err.message });
+
+        res.status(500).json({
+            statusCode : 500,
+            error: err.message
+        });
     }
 }
 
@@ -101,10 +111,11 @@ const auctionDetail = async (req, res, next) => {
 const auctionBid = async (req, res, next) => {
     try {
         let userInfo = new Map();
-        console.log("auctionBid - req.body: ", req.body)
-        console.log("auctionBid - req.body.auctionId: ", req.body.auctionId)
-        console.log("auctionBid - req.body.userId: ", req.body.userId)
-        console.log("auctionBid - req.body.bidPrice: ", req.body.bidPrice)
+        // console.log("auctionBid - req.body: ", req.body)
+        // console.log("auctionBid - req.body.auctionId: ", req.body.auctionId)
+        // console.log("auctionBid - req.body.userId: ", req.body.userId)
+        // console.log("auctionBid - req.body.bidPrice: ", req.body.bidPrice)
+
 
         switch (req.body.userId) {
             case "master":
@@ -120,20 +131,23 @@ const auctionBid = async (req, res, next) => {
                 console.log("default: ",req.query.userId);
         }
 
-        // userInfo, auctionId, bidPrice
-        // USER_V2_ADDRESS
-        // const result = await AuctionService.auctionBid(req.body.auctionId, process.env.USER_V1_ADDRESS, req.body.bidPrice);
+
         const result = await auctionService.auctionBid(req.body.auctionId, userInfo.get("userAddress"), req.body.bidPrice);
         console.info("result: ",result);
 
+
         // 결과값 전송
         res.status(200).json({
-            message: 'auctionBid 실행',
+            statusCode : 200,
             result: result
         })
     } catch (err) {
         console.error("err: ",err);
-        res.status(500).json({ error: err.message });
+
+        res.status(500).json({
+            statusCode : 500,
+            error: err.message
+        });
     }
 }
 
@@ -148,18 +162,22 @@ const auctionEnd = async (req, res, next) => {
         // userInfo.set("image_url", req.body.imageUrl);
 
 
-        // const result = await AuctionService.auctionList();
-        // console.info("result: ",result);
         const result = await auctionService.auctionEnd(req.body.auctionId);
         console.info("result: ",result);
 
+
         // 결과값 전송
         res.status(200).json({
-            message: 'auctionEnd 실행',
+            statusCode : 200,
+            message: result,
         })
     } catch (err) {
         console.error("err: ",err);
-        res.status(500).json({ error: err.message });
+
+        res.status(500).json({
+            statusCode : 500,
+            error: err.message
+        });
     }
 }
 
