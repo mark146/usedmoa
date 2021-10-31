@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
 import 'auction_item_register_screen.dart';
 import 'item_register_screen.dart';
 
@@ -20,6 +19,7 @@ class _ItemRegisterTabState extends State<ItemRegisterTabBar> with SingleTickerP
   // 커스텀 텍스트 스타일 정의
   TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 17.0);
 
+
   @override
   void initState() {
     super.initState();
@@ -27,6 +27,7 @@ class _ItemRegisterTabState extends State<ItemRegisterTabBar> with SingleTickerP
     // Initialize the Tab Controller
     controller = TabController(length: 2, vsync: this);
   }
+
 
   @override
   void dispose() {
@@ -36,25 +37,23 @@ class _ItemRegisterTabState extends State<ItemRegisterTabBar> with SingleTickerP
     super.dispose();
   }
 
+
   TabBar getTabBar() {
     return TabBar(
       tabs: <Tab>[
-        Tab(
-            child: Text("일반상품 등록",
-                textAlign: TextAlign.center,
-                style: style.copyWith(color: Colors.white, fontWeight: FontWeight.normal)
-            )
-        ),
-        Tab(
-          child: Text("경매상품 등록",
-              textAlign: TextAlign.center,
-              style: style.copyWith(color: Colors.white, fontWeight: FontWeight.normal)
-          ),
-        ),
+        Tab(child: Text("일반상품 등록",
+            textAlign: TextAlign.center,
+            style: style.copyWith(color: Colors.white, fontWeight: FontWeight.normal)
+        )),
+        Tab(child: Text("경매상품 등록",
+            textAlign: TextAlign.center,
+            style: style.copyWith(color: Colors.white, fontWeight: FontWeight.normal)
+        )),
       ],
       controller: controller,
     );
   }
+
 
   TabBarView getTabBarView(var tabs) {
     return TabBarView(

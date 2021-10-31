@@ -18,7 +18,6 @@ class AuctionItemRegister extends StatefulWidget {
 }
 
 
-
 class _AuctionItemRegisterState extends State<AuctionItemRegister> {
 
   // 텍스트 스타일을 정의
@@ -44,7 +43,6 @@ class _AuctionItemRegisterState extends State<AuctionItemRegister> {
   @override
   void initState() {
     super.initState();
-
     _product_name = TextEditingController();
     _product_price = TextEditingController();
     _content = TextEditingController();
@@ -89,14 +87,12 @@ class _AuctionItemRegisterState extends State<AuctionItemRegister> {
       mainAxisSize: MainAxisSize.min,
       children: [
 
-
-        // 상품 등록하기 UI
+        // 경매 상품 등록하기 UI
         Container(
           padding: const EdgeInsets.all(5),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-
               SizedBox(height: 10),
 
               Row(
@@ -104,7 +100,7 @@ class _AuctionItemRegisterState extends State<AuctionItemRegister> {
                 children: [
                   Icon(Icons.alarm),
                   SizedBox(width: 5),
-                  Text("경매상품 등록하기",
+                  Text("경매 상품 등록하기",
                       textAlign: TextAlign.center,
                       style: style.copyWith(color: Colors.black, fontWeight: FontWeight.bold)),
                 ],
@@ -175,9 +171,6 @@ class _AuctionItemRegisterState extends State<AuctionItemRegister> {
                 borderRadius: BorderRadius.all(Radius.circular(10.0)),
               ),
             ),
-            // onChanged: (text) { // 텍스트 변경 감지 이벤트
-            //   _product_name.text = text;
-            // },
             onSubmitted : (text) {
               _product_name.text = text;
               FocusScope.of(context).unfocus();
@@ -210,9 +203,6 @@ class _AuctionItemRegisterState extends State<AuctionItemRegister> {
                 borderRadius: BorderRadius.all(Radius.circular(10.0)),
               ),
             ),
-            // onChanged: (text) { // 텍스트 변경 감지 이벤트
-            //   _product_price.text = text;
-            // },
             onSubmitted : (text) {
               _product_price.text = text;
               FocusScope.of(context).unfocus();
@@ -245,9 +235,6 @@ class _AuctionItemRegisterState extends State<AuctionItemRegister> {
                 borderRadius: BorderRadius.all(Radius.circular(10.0)),
               ),
             ),
-            // onChanged: (text) { // 텍스트 변경 감지 이벤트
-            //   _content.text = text;
-            // },
             onSubmitted : (text) {
               _content.text = text;
               FocusScope.of(context).unfocus();
@@ -389,7 +376,6 @@ class _AuctionItemRegisterState extends State<AuctionItemRegister> {
   }
 
 
-
   // 비동기로 갤러리 이미지를 선택하는 함수 - 참고: https://ichi.pro/ko/flutterleul-sayonghayeo-aws-s3e-imiji-eoblodeu-1-bu-161375559492658
   Future _getImage() async {
     try {
@@ -430,7 +416,6 @@ class _AuctionItemRegisterState extends State<AuctionItemRegister> {
   // 사진 권한 요청 함수
   _onAddPhotoClicked(context) async {
     Permission permission;
-
 
     if (Platform.isIOS) {
       permission = Permission.photos;
@@ -582,7 +567,6 @@ class _AuctionItemRegisterState extends State<AuctionItemRegister> {
           'auction_start_time' : _auction_start_time.text,
           'auction_end_time' : _auction_end_time.text
         });
-
     // print("서버 요청 결과 - headers: ${response}");
     // print("서버 요청 결과 - statusCode: ${response.statusCode}");
     // print("서버 요청 결과 - headers(accesstoken): ${response.headers.value("accesstoken")}");
@@ -603,8 +587,7 @@ class _AuctionItemRegisterState extends State<AuctionItemRegister> {
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),// Dialog 화면 모서리 둥글게 조절
             title: Column(children: <Widget>[
               Text("알림창"),
-            ]
-            ),
+            ]),
 
             content: Column(
               mainAxisSize: MainAxisSize.min,
@@ -627,9 +610,9 @@ class _AuctionItemRegisterState extends State<AuctionItemRegister> {
                       ),
                     ]
                 ),
-                // SizedBox(height: 10),
               ],
             ),
+
             actions: <Widget>[
               TextButton(
                 onPressed: () {

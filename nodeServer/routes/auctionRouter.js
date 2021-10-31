@@ -1,7 +1,6 @@
 const express = require('express')
 const router = express.Router()
 const {auctionController} = require('../controllers')
-const {fileUpload} = require('../middlewares')
 const path = require("path");
 const multer  = require('multer');
 require('date-utils')

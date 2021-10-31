@@ -21,10 +21,14 @@ const login = async (req, res, next) => {
       // 2. 카카오톡 Access Token 검증
       await userService.kakaoTokenCheck(userInfo)
       console.log(`kakaoTokenCheck - userInfo: ${userInfo.size}`);
+      console.log(`kakaoTokenCheck - userInfo.get(id): ${userInfo.get("id")}`);
 
       // 3. userInfo 크기가 2 일 경우 토큰 재확인
       if (userInfo.size == 2) {
-        return res.status(401).json({ error: 'Auth Error from accessToken' });
+        return res.status(401).json({
+          statusCode : 401,
+          error: 'Auth Error from accessToken'
+        });
       } else {
         // 4. 사용자 정보 조회
         await userService.getUserInfo(userInfo);

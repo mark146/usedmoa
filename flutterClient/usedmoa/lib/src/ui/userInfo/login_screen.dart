@@ -50,7 +50,7 @@ class _LoginState extends State<Login> {
 
       // 서버 엑세스 토큰 요청
       var response = await loginRequest(token.accessToken);
-
+      print("response: ${response}");
 
       // 성공할 경우에만 저장
       if(response.statusCode == 200) {
@@ -64,6 +64,8 @@ class _LoginState extends State<Login> {
         prefs.setString('accessToken', response.headers.value("accesstoken") ?? "");
         prefs.setString('refreshToken', response.headers.value("refreshtoken") ?? "");
 
+        print("accessToken: ${response.headers.value("accesstoken") ?? ""}");
+        print("refreshToken: ${response.headers.value("refreshtoken") ?? ""}");
 
         // 뷰 종료 - 참고: https://origogi.github.io/flutter/flutter-push-pop-push/
         // Navigator.of(context).pop(context);
@@ -76,19 +78,31 @@ class _LoginState extends State<Login> {
     }
   }
 
+
   // 서버 엑세스 토큰 요청
   Future<Response<dynamic>> loginRequest(accessToken) async {
-    var dio = Dio();
-    final response = await dio.post(
-        'https://www.usedmoa.co.kr/users/login',
-        options: Options(
-          headers: {"authorization": "Bearer $accessToken"},
-        ));
-    // print("서버 요청 결과 - headers: ${response}");
-    // print("서버 요청 결과 - statusCode: ${response.statusCode}");
-    // print("서버 요청 결과 - headers(accesstoken): ${response.headers.value("accesstoken")}");
-    // print("서버 요청 결과 - headers(refreshtoken): ${response.headers.value("refreshtoken")}");
-    // print("서버 요청 결과 - data: ${response.data}");
+    Response<dynamic> response;
+    try {
+      var dio = Dio();
+      response = await dio.post(
+          'https://www.usedmoa.co.kr/users/login',
+          options: Options(
+            headers: {"authorization": "Bearer $accessToken"},
+          ));
+      // print("서버 요청 결과 - headers: ${response}");
+      // print("서버 요청 결과 - statusCode: ${response.statusCode}");
+      // print("서버 요청 결과 - headers(accesstoken): ${response.headers.value("accesstoken")}");
+      // print("서버 요청 결과 - headers(refreshtoken): ${response.headers.value("refreshtoken")}");
+      // print("서버 요청 결과 - data: ${response.data}");
+
+    } on DioError catch (error) {
+      if (error.response != null) {
+        print("error.response.data: ${error.response.data}");
+      } else {
+        print("error.message: ${error.response}");
+      }
+      response = error.response;
+    }
 
     return response;
   }
@@ -129,9 +143,7 @@ class _LoginState extends State<Login> {
               children: <Widget>[
                 Text("중고모아",
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 50,
-                      color: Colors.lightBlueAccent,
-                      fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 50, color: Colors.lightBlueAccent, fontWeight: FontWeight.bold),
                 ),
 
                 SizedBox(height: 120.0),

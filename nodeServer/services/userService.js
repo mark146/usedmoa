@@ -10,7 +10,6 @@ const erc1155Abi = JSON.parse(fs.readFileSync('/usr/local/nodejs/abi/erc1155_abi
 const contract = new web3js.eth.Contract(erc1155Abi, process.env.ERC1155_CONTRACT_ADDRESS);
 
 
-
 // 카카오톡 토큰 체크하는 함수
 const kakaoTokenCheck = async (userInfo) => {
   try {
@@ -70,6 +69,7 @@ const getUserInfo = async (userInfo) => {
     });
   } catch (err) {
     console.log("getUserInfo - Error: ", err.name);
+    return userInfo
   }
 }
 
@@ -100,6 +100,7 @@ const payment = async (userInfo) => {
   console.log("service - payment 실행");
   // const foundUser = await UserModel.userUpdate(userInfo)
 
+
   // 경매 인덱스
   const auctionId = await auctionIdCheck();
   console.info("auctionId: ",auctionId);
@@ -109,12 +110,12 @@ const payment = async (userInfo) => {
   const auctionInfo = await getAuctionInfo(userInfo.get("auctionId"));
   console.info("auctionInfo: ",auctionInfo);
 
-  
+
   // 토큰 정보 조회
   const tokenInfo = await getUserTokenInfo(userInfo.get("userAddress"));
   console.info("tokenInfo: ",tokenInfo);
 
-  
+
   // erc1155mint(process.env.ERC1155_CONTRACT_ADDRESS, 0, 2000);
   // 결제 유저 정보 체크
   // auctionId, userId
@@ -124,7 +125,6 @@ const payment = async (userInfo) => {
       .then(function(str) {
         console.log("erc1155Send: ",str);
       });
-
 }
 
 
