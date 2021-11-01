@@ -4,6 +4,7 @@ const {userController} = require('../controllers')
 
 
 // 핸들링 하는 컨트롤러 함수
+router.post('/refresh', userController.refresh)
 router.post('/logIn', userController.login)
 router.post('/payment', userController.payment)
 router.get('/tokenAmount', userController.tokenAmount)

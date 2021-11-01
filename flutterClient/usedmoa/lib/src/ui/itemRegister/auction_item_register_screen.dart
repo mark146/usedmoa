@@ -28,7 +28,6 @@ class _AuctionItemRegisterState extends State<AuctionItemRegister> {
 
   final ImagePicker _picker = ImagePicker();
   List<XFile> _imageFileList;
-  List<File> _photos = List<File>();
 
   SharedPreferences prefs;
 
@@ -117,20 +116,19 @@ class _AuctionItemRegisterState extends State<AuctionItemRegister> {
           height: 100,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
-            itemCount: _photos.length + 1,
+            itemCount: _imageFileList.length + 1,
             itemBuilder: (context, index) {
               if (index == 0) {
                 return _buildAddPhoto();
               }
-              File image = _photos[index - 1];
               return Stack(
                 children: <Widget>[
                   InkWell(
                     onTap: () {
-                      print('선택한 사진 제거 : ${_photos[index - 1]}');
+                      print('선택한 사진 제거 : ${_imageFileList[index - 1]}');
 
                       setState(() {
-                        _photos.remove(_photos[index - 1]);
+                        _imageFileList.remove(_imageFileList[index - 1]);
                       });
                     },
                     child: Container(
@@ -138,7 +136,7 @@ class _AuctionItemRegisterState extends State<AuctionItemRegister> {
                         height: 100,
                         width: 100,
                         color: kLightGray,
-                        child: Image.file(image)
+                        child: Image.file(File(_imageFileList[0].path))
                     ),
                   ),
                 ],
@@ -380,19 +378,14 @@ class _AuctionItemRegisterState extends State<AuctionItemRegister> {
   Future _getImage() async {
     try {
       // pickMultiImage() 메서드로 이미지(XFile) 리스트를 받아옴
-      final pickedFileList = await _picker.pickMultiImage(
-        maxWidth: 100,
-        maxHeight: 100,
-        imageQuality: 50,
-      );
+      final pickedFileList = await _picker.pickMultiImage();
 
       // 이미지 UI 수정
       setState(() {
         _imageFileList = pickedFileList;
-        _photos.add(File(_imageFileList[0].path));
       });
     } catch (e) {
-      print("error: ${e}");
+      print("_getImage - error: ${e}");
     }
   }
 
@@ -494,7 +487,6 @@ class _AuctionItemRegisterState extends State<AuctionItemRegister> {
 
   // 등록완료 버튼 클릭 - https://github.com/flutterchina/dio
   Future<void> PostData() async {
-
     prefs = await SharedPreferences.getInstance();
     String user_id = prefs.getString("user_id") ?? "";
     String accessToken = prefs.getString("accessToken") ?? "";
@@ -525,9 +517,6 @@ class _AuctionItemRegisterState extends State<AuctionItemRegister> {
     // 공백 체크
     if(_imageFileList == null) {
       setState(() {
-        if(_photos != null) {
-          _photos.clear();
-        }
         if(_product_name != null) {
           _product_name.clear();
         }

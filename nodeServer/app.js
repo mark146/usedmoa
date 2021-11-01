@@ -2,9 +2,10 @@
 const express = require('express')
 const router = require('./routes/routes')
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 const server = express()
 
-
+server.use(cookieParser());
 server.use(cors()); // CORS 방식 허용
 server.use(express.json()) // json 형태로 parsing
 server.use(express.urlencoded({ extended: true })) // 따로 설치가 필요한 qs 모듈을 사용하여 쿼리 스트링을 해석

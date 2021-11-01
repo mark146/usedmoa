@@ -11,7 +11,7 @@ const createJWT = async (userInfo) => {
     console.log(`createJWT 실행`)
 
     // 토큰의 내용(payload) : 사용자 이름, 사용자 역할 등과 같은 사용자에 대한 정보를 저장
-    let payload = { user_id: userInfo.get('id') }
+    let payload = { user_id: userInfo.get('user_id') }
 
     // access token 발급
     const accessToken = jwt.sign(payload,
@@ -25,7 +25,7 @@ const createJWT = async (userInfo) => {
 
     // refresh token 은 payload 없이 발급
     const refresh = jwt.sign(payload,
-        process.env.REFRESH_TOKEN_LIFE, { // 비밀 키
+        process.env.REFRESH_TOKEN_SECRET, { // 비밀 키
             algorithm: 'HS256', // 암호화 알고리즘
             expiresIn: process.env.REFRESH_TOKEN_LIFE,
         });
@@ -37,81 +37,56 @@ const createJWT = async (userInfo) => {
 
 
 // jwt 값 검증
-const create = async (req, res, next) => {
-    console.log(`createJWT 실행`)
-
-    // 토큰의 내용(payload) : 사용자 이름, 사용자 역할 등과 같은 사용자에 대한 정보를 저장
-    let payload = { user_id: req.body.user_id }
-
-    // access token 발급
-    const accessToken = jwt.sign(payload,
-        process.env.ACCESS_TOKEN_SECRET, { // 비밀 키
-            algorithm: 'HS256', // 암호화 알고리즘
-            expiresIn: process.env.ACCESS_TOKEN_LIFE
-        })
-    // userInfo.set("accessToken", accessToken)
-    // console.log(`accessToken: ${accessToken}`)
-
-
-    // refresh token 은 payload 없이 발급
-    const refresh = jwt.sign(payload,
-        process.env.REFRESH_TOKEN_LIFE, { // 비밀 키
-            algorithm: 'HS256', // 암호화 알고리즘
-            expiresIn: process.env.REFRESH_TOKEN_LIFE,
-        });
-    // userInfo.set("refreshToken", refresh)
-
-    // 쿠키 내에서 클라이언트에 액세스 토큰 보내기
-    res.cookie("jwt", accessToken, {secure: true, httpOnly: true})
-    res.header()
-    res.send()
-}
-
-
-// jwt 값 검증
-const verify = async (req, res, next) => {
-    let accessToken = req.cookies.jwt
-
-    // 쿠키에 저장된 토큰이 없으면 요청이 승인되지 않음
-    if (!accessToken){
-        return res.status(403).send()
-    }
+const verify = async (accessToken) => {
 
     let payload
     try {
+
+        // 쿠키에 저장된 토큰이 없으면 요청이 승인되지 않음
+        // if (!accessToken){
+        //     return "isEmpty accessToken"
+        // }
+
         // jwt.verify 메서드를 사용하여 액세스 토큰을 확인합니다.
         // 토큰이 만료되었거나 서명이 잘못된 경우 오류가 발생합니다.
         payload = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET)
-        console.log(`payload: ${payload}`)
-        next()
+        console.log(`verify - payload: ${payload.user_id}`)
+        console.log(`verify - JSON.stringify(payload): ${JSON.stringify(payload)}`)
     } catch (err) {
-        console.log(`verify - error: ${err.name}`)
+        console.log(`verify - error.name: ${err.name}`)
         //오류가 발생한 경우 반환 요청 승인되지 않은 오류 반환
-        res.status(401).send()
+        return err.name
     }
 }
 
 
-// refresh token 검증
-const refreshVerify = async (req, res) => {
-    let accessToken = req.cookies.jwt
-
-    if (!accessToken){
-        return res.status(403).send()
-    }
+// refresh token 검증 후 엑세스 토큰 발급
+const refreshVerify = async (userInfo) => {
 
     let payload
     try{
-        payload = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET)
+        payload = jwt.verify(userInfo.get("refreshToken"), process.env.REFRESH_TOKEN_SECRET)
+        console.log(`refreshVerify - payload.user_id: ${payload.user_id}`)
+        console.log(`refreshVerify - JSON.stringify(payload): ${JSON.stringify(payload)}`)
+
+        // 토큰의 내용(payload) : 사용자 이름, 사용자 역할 등과 같은 사용자에 대한 정보를 저장
+        let payload = { user_id: payload.user_id }
+
+        // access token 발급
+        const accessToken = jwt.sign(payload,
+            process.env.ACCESS_TOKEN_SECRET, { // 비밀 키
+                algorithm: 'HS256', // 암호화 알고리즘
+                expiresIn: process.env.ACCESS_TOKEN_LIFE
+            })
+        userInfo.set("accessToken", accessToken)
     } catch(err) {
         console.log(`refreshVerify - error: ${err.name}`)
-        return res.status(401).send()
+        return err.name
     }
 }
 
 
 module.exports = {
-    create,
     createJWT,
     verify,
     refreshVerify,

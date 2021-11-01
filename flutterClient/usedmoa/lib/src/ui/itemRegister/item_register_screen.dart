@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +8,8 @@ import 'package:http/http.dart' as http;
 import 'package:permission_handler/permission_handler.dart';
 import 'dart:io' show Platform;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:cookie_jar/cookie_jar.dart';
 
 
 class ItemRegister extends StatefulWidget {
@@ -26,8 +27,7 @@ class _ItemRegisterState extends State<ItemRegister> {
   Color kLightGray = Color(0xFFF1F0F5);
 
   final ImagePicker _picker = ImagePicker();
-  List<XFile> _imageFileList;
-  List<File> _photos = List<File>();
+  List<XFile> _imageFileList = [];
 
   SharedPreferences prefs;
 
@@ -115,20 +115,19 @@ class _ItemRegisterState extends State<ItemRegister> {
           height: 100,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
-            itemCount: _photos.length + 1,
+            itemCount: _imageFileList.length + 1,
             itemBuilder: (context, index) {
               if (index == 0) {
                 return _buildAddPhoto();
               }
-              File image = _photos[index - 1];
               return Stack(
                 children: <Widget>[
                   InkWell(
                     onTap: () {
-                      print('선택한 사진 제거 : ${_photos[index - 1]}');
+                      print('선택한 사진 제거 : ${_imageFileList[index - 1]}');
 
                       setState(() {
-                        _photos.remove(_photos[index - 1]);
+                        _imageFileList.remove(_imageFileList[index - 1]);
                       });
                     },
                     child: Container(
@@ -136,7 +135,7 @@ class _ItemRegisterState extends State<ItemRegister> {
                         height: 100,
                         width: 100,
                         color: kLightGray,
-                        child: Image.file(image)
+                        child: Image.file(File(_imageFileList[0].path))
                     ),
                   ),
                 ],
@@ -304,19 +303,14 @@ class _ItemRegisterState extends State<ItemRegister> {
   Future _getImage() async {
     try {
       // pickMultiImage() 메서드로 이미지(XFile) 리스트를 받아옴
-      final pickedFileList = await _picker.pickMultiImage(
-        maxWidth: 100,
-        maxHeight: 100,
-        imageQuality: 50,
-      );
+      final pickedFileList = await _picker.pickMultiImage();
 
       // 이미지 UI 수정
       setState(() {
         _imageFileList = pickedFileList;
-        _photos.add(File(_imageFileList[0].path));
       });
     } catch (e) {
-      print("error: ${e}");
+      print("_getImage - error: ${e}");
     }
   }
 
@@ -407,7 +401,7 @@ class _ItemRegisterState extends State<ItemRegister> {
     try {
       File image = File(_imageFileList[0].path);
 
-      var response = await http.put(Uri.parse(uploadUrl), body: image.readAsBytes());
+      var response = await http.put(Uri.parse(uploadUrl), body: image.readAsBytesSync());
       return response.statusCode;
     } catch (e) {
       throw ('Error uploading photo: ${e}');
@@ -439,75 +433,69 @@ class _ItemRegisterState extends State<ItemRegister> {
 
       // 서버에 글 등록 요청
       var response = await createRequest(accessToken, json);
-      print("response : ${response}");
+      // print("response : ${response}");
 
 
       if(response.statusCode != 200) {
         // print("response.data[statusCode] : ${response.data["statusCode"]}");
         print("response.data[message] : ${response.data["message"]}");
-
+        var result;
         switch(response.data["message"]) {
           case "JsonWebTokenError" :
-            refreshTokenRequest(accessToken, refreshToken);
+            result = refreshTokenRequest(accessToken, refreshToken);
+            print("JsonWebTokenError - result : ${result}");
+            print("JsonWebTokenError - accessToken : ${response.headers.value("accesstoken") ?? ""}");
+            print("JsonWebTokenError - refreshToken : ${response.headers.value("refreshtoken") ?? ""}");
+
+            // shared preferences 호출 후 값 저장
+            // final prefs = await SharedPreferences.getInstance();
+            // prefs.setString('accessToken', response.headers.value("accesstoken") ?? "");
+            // prefs.setString('refreshToken', response.headers.value("refreshtoken") ?? "");
+            break;
+          case "TokenExpiredError" :
+            result = refreshTokenRequest(accessToken, refreshToken);
+            print("TokenExpiredError - result : ${result}");
+            print("TokenExpiredError - accessToken : ${response.headers.value("accesstoken") ?? ""}");
+            print("TokenExpiredError - refreshToken : ${response.headers.value("refreshtoken") ?? ""}");
+
+            // shared preferences 호출 후 값 저장
+            // final prefs = await SharedPreferences.getInstance();
+            // prefs.setString('accessToken', response.headers.value("accesstoken") ?? "");
+            // prefs.setString('refreshToken', response.headers.value("refreshtoken") ?? "");
             break;
           default:
           // todo - 기타 에러 요청 처리
         }
+        // 서버에 글 등록 요청
+        response = await createRequest(prefs.get("accessToken"), json);
+        print("response : ${response}");
+
+
       } else {
 
         // 이미지 s3 업로드
         var result = await uploadImage(response.data['uploadUrl']);
-        print("result: ${result}");
+        print("이미지 s3 업로드 - result: ${result}");
 
-        // 공백 체크
-        /*
-      if(_imageFileList == null) {
-        setState(() {
-          if(_photos != null) {
-            _photos.clear();
-          }
-          if(_title != null) {
-            _title.clear();
-          }
-          if(_product_name != null) {
-            _product_name.clear();
-          }
-          if(_product_price != null) {
-            _product_price.clear();
-          }
-          if(_content != null) {
-            _content.clear();
-          }
-        });
+        // 입력창 리셋 다이얼로그 띄우기
+        if(result == 200) {
+          setState(() {
+            if(_title != null) {
+              _title.clear();
+            }
+            if(_product_name != null) {
+              _product_name.clear();
+            }
+            if(_product_price != null) {
+              _product_price.clear();
+            }
+            if(_content != null) {
+              _content.clear();
+            }
+          });
 
-        FlutterDialog();
-      }
-      */
-
-        /*
-      // 입력창 리셋 다이얼로그 띄우기
-      if(result == 200) {
-        setState(() {
-          if(_photos != null) {
-            _photos.clear();
-          }
-          if(_title != null) {
-            _title.clear();
-          }
-          if(_product_name != null) {
-            _product_name.clear();
-          }
-          if(_product_price != null) {
-            _product_price.clear();
-          }
-          if(_content != null) {
-            _content.clear();
-          }
-        });
-
-        FlutterDialog();
-      }
-      */
+          FlutterDialog();
+        }
       }
     }
   }
@@ -521,6 +509,9 @@ class _ItemRegisterState extends State<ItemRegister> {
     // print("_product_price.text 값 : ${_product_price.text}");
     // print("_content.text 값 : ${_content.text}");
 
+    print("prefs.getString(kakaoUserId) : ${prefs.getString("kakaoUserId") ?? ""}");
+    print("prefs.getString(user_id) : ${prefs.getString("user_id") ?? ""}");
+    print("prefs.getString(refreshToken) : ${prefs.getString("refreshToken") ?? ""}");
 
     Response<dynamic> response;
     try {
@@ -538,7 +529,7 @@ class _ItemRegisterState extends State<ItemRegister> {
             'product_price' : _product_price.text,
             'content' : _content.text,
           });
-      print("response.statusCode: ${response.statusCode}");
+      print("createRequest - response.statusCode: ${response.statusCode}");
 
       // 참고 : https://github.com/flutterchina/dio#examples
     } on DioError catch (error) {
@@ -555,7 +546,7 @@ class _ItemRegisterState extends State<ItemRegister> {
     // print("서버 요청 결과 - statusCode: ${response.statusCode}");
     // print("서버 요청 결과 - headers(accesstoken): ${response.headers.value("accesstoken")}");
     // print("서버 요청 결과 - headers(refreshtoken): ${response.headers.value("refreshtoken")}");
-    // print("서버 요청 결과 - data: ${response.data}");
+    print("서버 요청 결과 - data: ${response.data}");
     return response;
   }
 
@@ -565,14 +556,25 @@ class _ItemRegisterState extends State<ItemRegister> {
 
     Response<dynamic> response;
     try {
+      List<Cookie> cookies = [
+        new Cookie("refresh", prefs.getString("refreshToken") ?? ""),
+      ];
+      var cookieJar=CookieJar();
+      cookieJar.saveFromResponse(Uri.parse('https://www.usedmoa.co.kr/users/refresh'), cookies);
+
+
       var dio = Dio();
+      dio.interceptors.add(CookieManager(cookieJar));
       response = await dio.post(
-          'https://www.usedmoa.co.kr/board/create',
+          'https://www.usedmoa.co.kr/users/refresh',
           options: Options(
               headers: {
                 "authorization": "Bearer $accessToken",
-                "refresh" : "$refreshToken"
-              }));
+              }),
+          data: {
+            'user_id' : prefs.getString("user_id") ?? "",
+          }
+      );
       print("response: ${response}");
     } on DioError catch (error) {
       if (error.response != null) {

@@ -34,11 +34,11 @@ const login = async (req, res, next) => {
         await userService.getUserInfo(userInfo);
         // console.log(`getUserInfo - userInfo: ${userInfo.size}`);
 
-        // 5. access token 발급
-        await auth.createJWT(userInfo)
-
-        // 6. db에 유저 정보 조회
+        // 5. db에 유저 정보 조회
         await userService.findUser(userInfo)
+
+        // 6. access, refresh token 발급
+        await auth.createJWT(userInfo)
 
         // 7. 사용자가 없을 경우 생성, 있을 경우 정보 업데이트
         if (userInfo.get("user_id") === undefined) {
@@ -200,9 +200,71 @@ const tradeHistory = async (req, res, next) => {
 }
 
 
+// access, refresh Token 재발급
+const refresh = async (req, res, next) => {
+  console.log(`refresh 실행`);
+
+  try {
+    // 1. 값 추출
+    let accessToken = req.headers.authorization.split('Bearer ')[1];
+    let refreshToken = req.cookies.refresh;
+    let userInfo = new Map();
+    userInfo.set("accessToken", accessToken);
+    userInfo.set("refreshToken", refreshToken);
+    userInfo.set("user_id", req.body.user_id);
+    console.log("userInfo.get(user_id): " + userInfo.get("user_id"));
+    console.log(`refresh - accessToken: ${accessToken}`);
+    console.log(`refresh - refreshToken: ${refreshToken}`);
+    //console.log("req.cookies: " + JSON.stringify(req.cookies));
+
+
+    // Token 값 체크
+    if (req.headers.authorization && refreshToken != undefined) {
+
+      // todo - 토큰 값 검증 필요
+
+
+      const result = await auth.refreshVerify(userInfo);
+
+      switch (result) {
+        case "TokenExpiredError" :
+          await auth.createJWT(userInfo);
+          break;
+        default: // todo - 다른 에러 처리
+          await auth.refreshVerify(userInfo);
+      }
+      console.log(`result - accessToken: ${userInfo.get("accessToken")}`);
+      console.log(`result - refreshToken: ${userInfo.get("refreshToken")}`);
+
+      // 클라이언트 전달 - 새로 발급한 access token과 원래 있던 refresh token 모두 클라이언트에게 반환합니다.
+      res.setHeader("accessToken", userInfo.get("accessToken"))
+      res.setHeader("refreshToken", userInfo.get("refreshToken"))
+      res.status(200).json({
+        statusCode : 200,
+        message: 'Token 재발급 완료',
+      })
+    } else {
+      res.status(401).json({
+        statusCode : 401,
+        error: 'Auth Error from authorization'
+      });
+    }
+  } catch (err) {
+    console.error("err: ",err);
+
+    res.status(500).json({
+      statusCode : 500,
+      error: err.message
+    });
+  }
+}
+
+
+
 module.exports = {
   login,
   payment,
   tokenAmount,
   tradeHistory,
+  refresh,
 }

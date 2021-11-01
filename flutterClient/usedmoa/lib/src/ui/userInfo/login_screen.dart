@@ -43,6 +43,7 @@ class _LoginState extends State<Login> {
 
       // 유저 정보 조회
       User user = await UserApi.instance.me();
+      print("Kakao - user: ${user.id}");
       print("Kakao - nickname: ${user.kakaoAccount?.profile?.nickname}");
       print("Kakao - profileImageUrl: ${user.kakaoAccount?.profile?.profileImageUrl}");
       print("Kakao - email: ${user.kakaoAccount?.email}");
@@ -57,6 +58,7 @@ class _LoginState extends State<Login> {
 
         // shared preferences 호출 후 값 저장
         final prefs = await SharedPreferences.getInstance();
+        prefs.setString('kakaoUserId', "${user.id ?? ""}");
         prefs.setString('user_id', "${response.data['user_id'] ?? ""}");
         prefs.setString('nickname', user.kakaoAccount?.profile?.nickname ?? "");
         prefs.setString('email', response.data['email'] ?? "");
