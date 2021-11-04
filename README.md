@@ -51,4 +51,6 @@
 
 - 경매 기능 : NFT 기술을 사용하여 경매 이력을 이더리움 네트워크에 공개
 
+![경매사진](https://user-images.githubusercontent.com/24368929/140262741-5cbbd29f-246f-46bb-ac1e-cda7982e268e.PNG)
+
 - 결제 기능 : ERC-1155 토큰을 사용하여 중고 물품 결제
