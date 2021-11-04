@@ -4,15 +4,12 @@ import 'package:usedmoa/src/model/videoCall.dart';
 import 'package:video_player/video_player.dart';
 
 
-
 class VideoPlayerScreen extends StatefulWidget {
   VideoCall videoInfo = new VideoCall();
-
 
   VideoPlayerScreen(VideoCall videoCallList) {
     this.videoInfo = videoCallList;
   }
-
 
   @override
   _VideoPlayerScreenState createState() => _VideoPlayerScreenState(videoInfo);
@@ -20,16 +17,14 @@ class VideoPlayerScreen extends StatefulWidget {
 
 
 class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
-
-  // https://usedmoa.s3.ap-northeast-2.amazonaws.com/video/df62c8b5-0e0d-4e4c-b7ee-ecc07a692778.mp4
   VideoPlayerController _controller;
   Future<void> _initializeVideoPlayerFuture;
   VideoCall videoInfo;
 
+
   _VideoPlayerScreenState(VideoCall videoInfo) {
     this.videoInfo = videoInfo;
   }
-
 
 
   @override
@@ -52,13 +47,14 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     super.initState();
   }
 
+
   @override
   void dispose() {
     // 자원을 반환하기 위해 VideoPlayerController dispose.
     _controller.dispose();
-
     super.dispose();
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +70,9 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
           if (snapshot.connectionState == ConnectionState.done) {
             // VideoPlayerController 초기화 끝나면, 제공된 데이터 사용하여 VideoPlayer 종횡비 제한.
             return AspectRatio(
-              aspectRatio: _controller.value.aspectRatio,
+              // aspectRatio: _controller.value.aspectRatio,
+              // aspectRatio: 16/9,
+               aspectRatio: 26/20,
               // 영상 보여주기 위해 VideoPlayer 위젯 사용.
               child: VideoPlayer(_controller),
             );
@@ -98,9 +96,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
           });
         },
         // 플레이어 상태에 따라 올바른 아이콘 보여줌.
-        child: Icon(
-          _controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
-        ),
+        child: Icon(_controller.value.isPlaying ? Icons.pause : Icons.play_arrow),
       ), // 이 마지막 콤마는 build 메서드에 자동 서식이 잘 적용될 수 있도록 도와줌.
     );
   }

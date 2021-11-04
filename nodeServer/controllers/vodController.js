@@ -60,6 +60,7 @@ const vodList = async (req, res, next) => {
 
 // vod 파일 s3 업로드하는 함수
 const vodUpload = async (req, res, next) => {
+    console.log("vodUpload 실행")
     try {
         let userInfo = new Map();
 
@@ -91,13 +92,12 @@ const vodUpload = async (req, res, next) => {
         const result = filePath.join('');
         console.log("vodUpload - filePath: ",result)
 
-        // Directory 존재 여부 체크, 디렉토리 경로 입력
+        // Directory 존재 여부 체크
         const directory = fs.existsSync(result)
-
 
         // 2. s3 파일 업로드, Directory가 존재 할 경우 true, 없을 경우 false
         if(directory == true) {
-            //console.log("Boolan : ", directory);
+            console.log("Boolan : ", directory);
             const fileName = uuid.v4();
             const fileContent = fs.readFileSync(result);
             const s3Params = {
