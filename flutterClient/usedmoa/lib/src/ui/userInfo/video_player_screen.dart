@@ -71,7 +71,6 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
             // VideoPlayerController 초기화 끝나면, 제공된 데이터 사용하여 VideoPlayer 종횡비 제한.
             return AspectRatio(
               // aspectRatio: _controller.value.aspectRatio,
-              // aspectRatio: 16/9,
                aspectRatio: 26/20,
               // 영상 보여주기 위해 VideoPlayer 위젯 사용.
               child: VideoPlayer(_controller),

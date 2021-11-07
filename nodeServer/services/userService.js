@@ -1,4 +1,4 @@
-const { UserModel, BoardModel } = require('../models')
+const { UserModel } = require('../models')
 const axios = require("axios");
 const dotenv = require('dotenv').config();
 const Web3 = require('web3');
@@ -92,6 +92,13 @@ const findUser = async (userInfo) => {
 const userCreate = async (userInfo) => {
   const foundUser = await UserModel.userCreate(userInfo)
   return foundUser
+}
+
+
+// 유저 리프레시 토큰 정보 조회
+const refreshVerify = async (userInfo) => {
+  const refreshVerify = await UserModel.refreshVerify(userInfo)
+  return refreshVerify
 }
 
 
@@ -252,6 +259,7 @@ module.exports = {
   kakaoTokenCheck,
   getUserInfo,
   userUpdate,
+  refreshVerify,
   findUser,
   userCreate,
   payment,

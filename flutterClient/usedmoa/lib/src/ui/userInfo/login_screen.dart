@@ -96,7 +96,6 @@ class _LoginState extends State<Login> {
       // print("서버 요청 결과 - headers(accesstoken): ${response.headers.value("accesstoken")}");
       // print("서버 요청 결과 - headers(refreshtoken): ${response.headers.value("refreshtoken")}");
       // print("서버 요청 결과 - data: ${response.data}");
-
     } on DioError catch (error) {
       if (error.response != null) {
         print("error.response.data: ${error.response.data}");

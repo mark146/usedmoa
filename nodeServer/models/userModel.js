@@ -15,7 +15,7 @@ const findUser = async (userInfo) => {
     let rows = await conn.query(sql);
 
     // 조회한 정보 저장
-    for(var i = 0; i < rows.length ; i++){
+    for(let i = 0; i < rows.length ; i++){
       userInfo.set('user_id', rows[i].id);
       userInfo.set('nickname', rows[i].nickname);
       userInfo.set('email', rows[i].email);
@@ -92,10 +92,34 @@ const userUpdate = async (userInfo) => {
     const rows = await conn.query(sql);
 
     await conn.commit() // 커밋
-
-    return rows;
   } catch (err) {
     await conn.rollback() // 롤백
+    console.log("SQL error: ", err);
+  } finally {
+    // Close Connection
+    if (conn) conn.end();
+  }
+}
+
+
+// 유저 리프레시 토큰 정보 조회
+const refreshVerify = async (userInfo) => {
+  console.log("userMedel - refreshVerify 실행")
+
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    let refreshToken = userInfo.get("refreshToken").trim()
+
+    let sql = `SELECT * FROM user where refresh_token = '${refreshToken}'`;
+    let rows = await conn.query(sql);
+
+    // 조회한 정보 저장
+    for(let i = 0; i < rows.length ; i++) {
+      userInfo.set('user_id', rows[i].id);
+      console.log('user_id', rows[i].id);
+    }
+  } catch (err) {
     console.log("SQL error: ", err);
   } finally {
     // Close Connection
@@ -108,4 +132,5 @@ module.exports = {
   findUser,
   userCreate,
   userUpdate,
+  refreshVerify,
 }
