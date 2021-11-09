@@ -60,7 +60,7 @@ class _ItemListState extends State<ItemList> {
                               width: 1.0
                           ),
                           borderRadius: BorderRadius.all(
-                              Radius.circular(10) // POINT
+                              Radius.circular(15) // POINT
                           ),
                         ),
                         child: ClipRRect(
@@ -76,21 +76,13 @@ class _ItemListState extends State<ItemList> {
                                   decoration: BoxDecoration(
                                     image: DecorationImage(
                                         image: imageProvider,
-                                        fit: BoxFit.fitHeight,
-                                        // colorFilter: ColorFilter.mode(Colors.white, BlendMode.difference)
+                                        fit: BoxFit.cover,
                                       ),
                                   ),
                                 ),
                                 placeholder: (context, url) => CircularProgressIndicator(),
                                 errorWidget: (context, url, error) => Icon(Icons.error),
                               ),
-
-                              // Image.network(
-                              //   boardList[index].image_url, // 해당 url 값을 이미지로
-                              //   fit: BoxFit.fitHeight, // 이미지 채우기
-                              //   width: double.infinity,
-                              //   height: 150,
-                              // ),
                             )
                         ),
                       ),

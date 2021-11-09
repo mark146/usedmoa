@@ -5,7 +5,6 @@ const AuctionInfo = require('../dto/auctionInfo');
 const axios = require("axios");
 const fs = require("fs");
 const formData = require("form-data");
-const path = require('path');
 const Web3 = require('web3');
 const moment = require('moment').tz.setDefault("Asia/Seoul"); // TODO 시간 처리 부분 다시 공부 -> dayjs
 const web3js = new Web3(

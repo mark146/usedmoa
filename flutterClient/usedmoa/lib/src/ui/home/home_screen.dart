@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -145,10 +146,19 @@ class _HomeState extends State<Home> {
                         child: Stack(
                           // 자식들을 쌓아서 배치합니다. Stack의 크기는 자식들의 크기 중 가장 큰 크기에 맞춰집니다.
                           children: <Widget>[
-                            Image.network(
-                              item.imageUri, // 해당 url 값을 이미지로
-                              fit: BoxFit.cover, // 이미지 채우기
+                            CachedNetworkImage(
+                              imageUrl: item.imageUri, // 해당 url 값을 이미지로
                               width: double.infinity,
+                              imageBuilder: (context, imageProvider) => Container(
+                                decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                    image: imageProvider,
+                                    fit: BoxFit.cover, // 이미지 채우기
+                                  ),
+                                ),
+                              ),
+                              placeholder: (context, url) => CircularProgressIndicator(),
+                              errorWidget: (context, url, error) => Icon(Icons.error),
                             ),
                           ],
                         ),
@@ -246,12 +256,27 @@ class _HomeState extends State<Home> {
                             child: Stack(
                               // 자식들을 쌓아서 배치합니다. Stack의 크기는 자식들의 크기 중 가장 큰 크기에 맞춰집니다.
                                 children: <Widget>[
-                                  Image.network(
-                                    items[i].imageUri, // 해당 url 값을 이미지로
-                                    fit: BoxFit.cover, // 이미지 채우기
-                                    width: double.infinity,
+                                  CachedNetworkImage(
+                                    imageUrl: items[i].imageUri, // 해당 url 값을 이미지로
                                     height: 130,
+                                    imageBuilder: (context, imageProvider) => Container(
+                                      decoration: BoxDecoration(
+                                        image: DecorationImage(
+                                          image: imageProvider,
+                                          fit: BoxFit.cover, // 이미지 채우기
+                                        ),
+                                      ),
+                                    ),
+                                    placeholder: (context, url) => CircularProgressIndicator(),
+                                    errorWidget: (context, url, error) => Icon(Icons.error),
                                   ),
+
+                                  // Image.network(
+                                  //   items[i].imageUri, // 해당 url 값을 이미지로
+                                  //   fit: BoxFit.cover, // 이미지 채우기
+                                  //   width: double.infinity,
+                                  //   height: 130,
+                                  // ),
                                 ]),
                           ),
                           Text(items[i].productName,

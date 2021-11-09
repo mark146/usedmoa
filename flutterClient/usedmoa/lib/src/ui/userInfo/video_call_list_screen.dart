@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -49,10 +50,10 @@ class _VideoCallListScreenState extends State<VideoCallListScreen> {
     String user_id = prefs.getString("user_id") ?? "";
 
     final response = await dio.get(
-      'https://www.usedmoa.co.kr/vod/list',
-      options: Options(
-        headers: {"authorization": "Bearer $accessToken"},
-      ),
+        'https://www.usedmoa.co.kr/vod/list',
+        options: Options(
+          headers: {"authorization": "Bearer $accessToken"},
+        ),
         queryParameters: {'user_id': user_id}
     );
     print("서버 요청 결과 - data: ${response.data["list"]}");
@@ -89,68 +90,75 @@ class _VideoCallListScreenState extends State<VideoCallListScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center, // 가로축 정렬 속성
                   children: <Widget>[
-                      Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                                color: Colors.black12,
-                                width: 1.0
-                            ),
-                            borderRadius: BorderRadius.all(
-                                Radius.circular(10) // POINT
-                            ),
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                              color: Colors.black12,
+                              width: 1.0
                           ),
-                          child: ClipRRect(
-                              child:
-                              Container(
-                                height: 150,
-                                width: 100,
-                                color: Colors.black12,
-                                child: Image.network(
-                                  VideoCallList[index].image_url, // 해당 url 값을 이미지로
-                                  fit: BoxFit.fitHeight, // 이미지 채우기
-                                  width: double.infinity,
-                                  height: 150,
+                          borderRadius: BorderRadius.all(
+                              Radius.circular(10) // POINT
+                          ),
+                        ),
+                        child: ClipRRect(
+                            child:
+                            Container(
+                              height: 150,
+                              width: 100,
+                              color: Colors.black12,
+                              child: CachedNetworkImage(
+                                imageUrl: VideoCallList[index].image_url, // 해당 url 값을 이미지로
+                                imageBuilder: (context, imageProvider) => Container(
+                                  decoration: BoxDecoration(
+                                    image: DecorationImage(
+                                      image: imageProvider,
+                                      fit: BoxFit.cover, // 이미지 채우기
+                                    ),
+                                  ),
                                 ),
-                              )
-                          ),
+                                placeholder: (context, url) => CircularProgressIndicator(),
+                                errorWidget: (context, url, error) => Icon(Icons.error),
+                              ),
+                            )
                         ),
-                        flex: 2,
                       ),
+                      flex: 2,
+                    ),
 
-                      Expanded(
-                        flex: 2,
-                        child: Container(
-                          padding: const EdgeInsets.only(left: 10, top: 15, right: 5),
-                          child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Text(VideoCallList[index].title,
-                                    textAlign: TextAlign.start,
-                                    maxLines: 1,
-                                    style: TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w500,
-                                        fontStyle: FontStyle.normal,
-                                        letterSpacing: 0.5)),
+                    Expanded(
+                      flex: 2,
+                      child: Container(
+                        padding: const EdgeInsets.only(left: 10, top: 15, right: 5),
+                        child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Text(VideoCallList[index].title,
+                                  textAlign: TextAlign.start,
+                                  maxLines: 1,
+                                  style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w500,
+                                      fontStyle: FontStyle.normal,
+                                      letterSpacing: 0.5)),
 
-                                SizedBox(height: 75.0),
+                              SizedBox(height: 75.0),
 
-                                Row(
-                                    children: [
-                                      Expanded(
-                                        flex: 2,
-                                        child: Align(
-                                          alignment: Alignment.bottomRight,
-                                          child: Text(VideoCallList[index].create_date,
-                                              textAlign: TextAlign.center),
-                                        ),
+                              Row(
+                                  children: [
+                                    Expanded(
+                                      flex: 2,
+                                      child: Align(
+                                        alignment: Alignment.bottomRight,
+                                        child: Text(VideoCallList[index].create_date,
+                                            textAlign: TextAlign.center),
                                       ),
-                                    ]),
-                              ]
-                          ),
+                                    ),
+                                  ]),
+                            ]
                         ),
                       ),
+                    ),
                   ]
               ),
             )

@@ -268,7 +268,10 @@ class _ItemRegisterState extends State<ItemRegister> {
               _content.text = text;
               FocusScope.of(context).unfocus();
             },
-            keyboardType: TextInputType.emailAddress,
+            keyboardType: TextInputType.multiline,
+            textInputAction: TextInputAction.newline,
+            minLines: 1,
+            maxLines: 10,
           ),
         ),
         SizedBox(height: 15),
@@ -492,6 +495,8 @@ class _ItemRegisterState extends State<ItemRegister> {
             if(_content != null) {
               _content.clear();
             }
+
+            _imageFileList.clear();
           });
 
           FlutterDialog();

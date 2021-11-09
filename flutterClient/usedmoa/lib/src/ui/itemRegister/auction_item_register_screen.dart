@@ -237,7 +237,10 @@ class _AuctionItemRegisterState extends State<AuctionItemRegister> {
               _content.text = text;
               FocusScope.of(context).unfocus();
             },
-            keyboardType: TextInputType.text,
+            keyboardType: TextInputType.multiline,
+            textInputAction: TextInputAction.newline,
+            minLines: 1,
+            maxLines: 10,
           ),
         ),
         SizedBox(height: 15),

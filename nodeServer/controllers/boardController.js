@@ -56,8 +56,6 @@ const boardList = async (req, res, next) => {
 
 
 // 글 생성
-// 'accessToken' => 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxODk2MDM2ODUzLCJpYXQiOjE2MzU2MTEzNjMsImV4cCI6MTYzNTYxMTY2M30.TdTkSB-qb8Z1WrDuQSz1QUrX7faxlwmBNFpkI94bp_E'
-// 'refreshToken' => 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxODk2MDM2ODUzLCJpYXQiOjE2MzU2MTEzNjMsImV4cCI6MTYzNjkwNzM2M30.AmmSxNYNDfvV8gZgCUP53PrXLr1bWPRPGQu4FfDYlyI'
 const boardCreate = async (req, res, next) => {
     try {
         let accessToken = "";

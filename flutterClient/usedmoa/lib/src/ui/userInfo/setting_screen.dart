@@ -437,5 +437,9 @@ Future<String> getTokenInfoRequest() async {
       queryParameters: {'userId': "master"}
   );
 
+  // shared preferences 에 값 저장
+  final prefs = await SharedPreferences.getInstance();
+  prefs.setString('amount', response.data["amount"]);
+
   return response.data["amount"];
 }
