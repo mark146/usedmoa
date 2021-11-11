@@ -27,7 +27,7 @@ class _AuctionItemRegisterState extends State<AuctionItemRegister> {
   Color kLightGray = Color(0xFFF1F0F5);
 
   final ImagePicker _picker = ImagePicker();
-  List<XFile> _imageFileList;
+  List<XFile> _imageFileList = [];
 
   SharedPreferences prefs;
 
@@ -490,32 +490,35 @@ class _AuctionItemRegisterState extends State<AuctionItemRegister> {
 
   // 등록완료 버튼 클릭 - https://github.com/flutterchina/dio
   Future<void> PostData() async {
-    prefs = await SharedPreferences.getInstance();
-    String user_id = prefs.getString("user_id") ?? "";
-    String accessToken = prefs.getString("accessToken") ?? "";
 
-    Map<String, dynamic> json = new Map();
-    json["user_id"] = user_id;
-    // json["imageUrl"] = _imageFileList[_imageFileList.length-1].path;
-    json["imageUrl"]= "";
-    json["product_name"]= _product_name.text;
-    json["product_price"]= _product_price.text;
-    json["content"]= _content.text;
-    json["auction_start_time"]= _auction_start_time.text;
-    json["auction_end_time"]= _auction_end_time.text;
+    if(_imageFileList != null && _imageFileList.isEmpty) {
+      print("_imageFileList!.isEmpty : ${_imageFileList.isEmpty}");
+    } else {
+      prefs = await SharedPreferences.getInstance();
+      String user_id = prefs.getString("user_id") ?? "";
+      String accessToken = prefs.getString("accessToken") ?? "";
 
-    print('user_id: ${json["user_id"]}');
-    print('imageUrl: ${json["imageUrl"]}');
-    print('_product_name: ${_product_name.text}');
-    print('_product_price: ${_product_price.text}');
-    print('_content: ${_content.text}');
-    print('_auction_start_time: ${_auction_start_time.text}');
-    print('_auction_end_time: ${_auction_end_time.text}');
+      Map<String, dynamic> json = new Map();
+      json["user_id"] = user_id;
+      json["imageUrl"]= "";
+      json["product_name"]= _product_name.text;
+      json["product_price"]= _product_price.text;
+      json["content"]= _content.text;
+      json["auction_start_time"]= _auction_start_time.text;
+      json["auction_end_time"]= _auction_end_time.text;
+
+      print('user_id: ${json["user_id"]}');
+      print('imageUrl: ${json["imageUrl"]}');
+      print('_product_name: ${_product_name.text}');
+      print('_product_price: ${_product_price.text}');
+      print('_content: ${_content.text}');
+      print('_auction_start_time: ${_auction_start_time.text}');
+      print('_auction_end_time: ${_auction_end_time.text}');
 
 
-    // 서버에 상품 등록 요청
-    await createRequest(accessToken, json);
-
+      // 서버에 상품 등록 요청
+      await createRequest(accessToken, json);
+    }
 
     // 공백 체크
     if(_imageFileList == null) {

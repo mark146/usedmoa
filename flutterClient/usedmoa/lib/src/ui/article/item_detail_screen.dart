@@ -483,19 +483,17 @@ class _ItemDetailState extends State<ItemDetail> {
     showDialog(
       context: detailContext,
       builder: (BuildContext context) {
-        // 이더리움 클래스 생성
-        // var ethereum = Ethereum();
-        // ethereum.sendTokens(2000);
 
-        
-        // dio 서버 결제 요청
-        
-        Future.delayed(Duration(seconds: 3), () {
-          Navigator.pop(context);
+        // todo - dio 서버 결제 요청
 
-          final snackBar = SnackBar(content: Text('결제 완료!'));
-          ScaffoldMessenger.of(detailContext).showSnackBar(snackBar);
-        });
+
+
+        // Future.delayed(Duration(seconds: 3), () {
+        //   Navigator.pop(context);
+        //
+        //   final snackBar = SnackBar(content: Text('결제 완료!'));
+        //   ScaffoldMessenger.of(detailContext).showSnackBar(snackBar);
+        // });
 
         return AlertDialog(
           shape: RoundedRectangleBorder(
@@ -518,4 +516,40 @@ class _ItemDetailState extends State<ItemDetail> {
       },
     );
   }
+
+
+  // 서버에 결제 요청
+  Future<Response<dynamic>> paymentRequest() async {
+    Response<dynamic> response;
+    try {
+      var dio = Dio();
+      response = await dio.post(
+          'https://www.usedmoa.co.kr/board/create',
+          options: Options(
+            headers: {"authorization": "Bearer ${prefs.getString("accessToken") ?? ""}"},
+          ),
+          data: {
+             'board_id' : itemInfo.id,
+            // 'image_url' : json["imageUrl"],
+            // 'title' : _title.text,
+            // 'product_name' : _product_name.text,
+            // 'product_price' : _product_price.text,
+            // 'content' : _content.text,
+          });
+      print("createRequest - response.statusCode: ${response.statusCode}");
+
+      // 참고 : https://github.com/flutterchina/dio#examples
+    } on DioError catch (error) {
+      if (error.response != null) {
+        print("error.response.data: ${error.response.data}");
+      } else {
+        print("error.message: ${error.response}");
+      }
+      response = error.response;
+    }
+    print("서버 요청 결과 - headers: ${response}");
+    print("서버 요청 결과 - data: ${response.data}");
+    return response;
+  }
+
 }

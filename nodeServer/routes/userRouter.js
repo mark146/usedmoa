@@ -7,7 +7,8 @@ const {userController} = require('../controllers')
 router.post('/refresh', userController.refresh)
 router.post('/logIn', userController.login)
 router.post('/payment', userController.payment)
-router.get('/tokenAmount', userController.tokenAmount)
+router.post('/itemPayment', userController.itemPayment)
+router.get('/balance', userController.balance)
 router.get('/tradeHistory', userController.tradeHistory)
 
 

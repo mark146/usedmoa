@@ -1,9 +1,11 @@
+import 'dart:io';
 import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:usedmoa/src/blockChain/EthereumModel.dart';
+import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:cookie_jar/cookie_jar.dart';
 
 
 class Setting extends StatefulWidget {
@@ -20,6 +22,7 @@ class _SettingState extends State<Setting> {
   TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 17.0);
   TextStyle nameStyle = TextStyle(fontFamily: 'Montserrat', fontSize: 15.0);
 
+
   // shared preferences 얻기
   SharedPreferences prefs;
   String nickname = "";
@@ -27,9 +30,10 @@ class _SettingState extends State<Setting> {
   String profileImageUrl = "";
   String balance = "balance";
   String user_id = "";
+  String blance = "0";
 
 
-  //  딱 1번만 실행되고 절대 다시는 실행되지 않습니다
+  // 딱 1번만 실행되고 절대 다시는 실행되지 않습니다
   @override
   void initState() {
     super.initState();
@@ -57,18 +61,17 @@ class _SettingState extends State<Setting> {
   }
 
 
-  // 로그인 정보 조회
+  // 로그인하기 버튼 누를 경우 실행
   _login() async {
+    print("_login 실행");
 
     prefs = await SharedPreferences.getInstance();
     nickname = prefs.getString("nickname") ?? "";
     email = prefs.getString("email") ?? "";
     profileImageUrl = prefs.getString("profileImageUrl") ?? "";
-    print("_login 실행");
     print("_login - nickname: ${nickname}");
     print("_login - profileImageUrl: ${profileImageUrl}");
     print("_login - email: ${email}");
-
 
     loginController.add(nickname);
   }
@@ -101,8 +104,7 @@ class _SettingState extends State<Setting> {
   Widget mainScrollView() {
     return SingleChildScrollView(
       scrollDirection: Axis.vertical,
-      //  scrollDirection 속성을 사용해 원하는 스크롤 방향을 지정할 수 있습니다.
-      padding: const EdgeInsets.all(5),
+      padding: const EdgeInsets.all(5), // 사용해 원하는 스크롤 방향을 지정
       child: StreamBuilder(
         stream: loginController.stream,
         builder: (context, snapshot) {
@@ -124,7 +126,6 @@ class _SettingState extends State<Setting> {
       ),
     );
   }
-
 
 
   // 로그인 했을 경우
@@ -180,17 +181,13 @@ class _SettingState extends State<Setting> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    // Icon(Icons.attach_money),
-                    // SizedBox(width: 10),
                     FutureBuilder(
                         future: getTokenInfoRequest(),
                         builder: (BuildContext context, AsyncSnapshot snapshot) {
                           //해당 부분은 data를 아직 받아 오지 못했을때 실행되는 부분을 의미한다.
                           if (snapshot.hasData == false) {
                             return CircularProgressIndicator();
-                          }
-                          //error가 발생하게 될 경우 반환하게 되는 부분
-                          else if (snapshot.hasError) {
+                          } else if (snapshot.hasError) {  //error가 발생하게 될 경우 반환하게 되는 부분
                             return Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Text(
@@ -198,13 +195,35 @@ class _SettingState extends State<Setting> {
                                 style: TextStyle(fontSize: 8),
                               ),
                             );
-                          }
-                          // 데이터를 정상적으로 받아오게 되면 다음 부분을 실행하게 되는 것이다.
-                          else {
+                          } else {  // 데이터를 정상적으로 받아오게 될 경우 실행
+
+                            try {
+                              print("snapshot.data.toString(): ${snapshot.data.toString()}");
+                              print("snapshot.data.statusCode: ${snapshot.data.statusCode}");
+                              switch(snapshot.data.statusCode) {
+                                case 500 :
+                                  print("case 500 : ${snapshot.data.toString()}");
+                                  break;
+                                case 401 :
+                                  print("case 401 : ${snapshot.data.toString()}");
+                                  // 엑세스, 리프래시 토큰 재요청
+                                  refreshTokenRequest();
+
+                                  // 토큰 갯수 정보 조회
+                                  getTokenInfoRequest();
+                                  break;
+                                default :
+                                  print("default : ${snapshot.data.toString()}");
+                              }
+                            } catch(error) {
+                              print("error: ${error}");
+                            }
+                            print("결과값 UI 반영 : ${snapshot.data.toString()}");
+                            // 결과값 UI 반영
                             return Padding(
                               padding: const EdgeInsets.all(0.0),
                               child: Text(
-                                snapshot.data.toString()+" 원",
+                                snapshot.data+" 원",
                                 textAlign: TextAlign.center,
                                 style:  TextStyle(fontSize: 14),
                               ),
@@ -217,7 +236,6 @@ class _SettingState extends State<Setting> {
             ),
           ]),
         ),
-
         SizedBox(height: 20),
 
         // 거래내역 UI
@@ -256,7 +274,6 @@ class _SettingState extends State<Setting> {
             ),
           ]),
         ),
-
         SizedBox(height: 20),
 
         // 영상 다시보기 UI
@@ -271,7 +288,6 @@ class _SettingState extends State<Setting> {
                 });
               }
             });
-
           },
           child: Container(
             padding: const EdgeInsets.all(5),
@@ -311,7 +327,6 @@ class _SettingState extends State<Setting> {
             ]),
           ),
         ),
-
         SizedBox(height: 20),
 
         // 로그인 UI - 클릭 이벤트 참고: https://www.codegrepper.com/code-examples/dart/flutter+container+onclick
@@ -355,8 +370,8 @@ class _SettingState extends State<Setting> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-
         SizedBox(height: 20),
+
 
         // 알림 설정 UI
         Container(
@@ -426,20 +441,108 @@ class _SettingState extends State<Setting> {
       ],
     );
   }
+
+
+  // 사용자 보유 토큰 정보 요청
+  Future<Response<dynamic>> getTokenInfoRequest() async {
+    final prefs = await SharedPreferences.getInstance();
+    var walletAddress = prefs.getString("walletAddress") ?? "";
+    var accessToken = prefs.getString("accessToken") ?? "";
+
+    Response<dynamic> response;
+    try {
+      var dio = Dio();
+      final response = await dio.get(
+          'https://www.usedmoa.co.kr/users/balance',
+          options: Options(
+            headers: {"authorization": "Bearer $accessToken"},
+          ),
+          queryParameters: {'walletAddress': walletAddress}
+      );
+
+
+      prefs.setString('amount', response.data["amount"]);
+      blance = response.data["amount"];
+      ethereumController.add(blance);
+      print("getTokenInfoRequest() - headers: ${response}");
+    } on DioError catch (error) {
+      if (error.response != null) {
+        print("error.response.data: ${error.response.data}");
+      } else {
+        print("error.message: ${error.response}");
+      }
+      response = error.response;
+    }
+
+    return response;
+  }
+
+
+  // 엑세스 토큰 요청 - 참고 : https://github.com/flutterchina/dio#examples
+  Future<Response<dynamic>> refreshTokenRequest() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String accessToken = prefs.getString("accessToken") ?? "";
+    String refreshToken = prefs.getString("refreshToken") ?? "";
+
+    Response<dynamic> response;
+    try {
+      List<Cookie> cookies = [
+        new Cookie("refresh", refreshToken),
+      ];
+      var cookieJar=CookieJar();
+      cookieJar.saveFromResponse(Uri.parse('https://www.usedmoa.co.kr/users/refresh'), cookies);
+
+
+      var dio = Dio();
+      dio.interceptors.add(CookieManager(cookieJar));
+      response = await dio.post(
+          'https://www.usedmoa.co.kr/users/refresh',
+          options: Options(
+              headers: {
+                "authorization": "Bearer $accessToken",
+              })
+      );
+      print("response: ${response}");
+
+      if(response.statusCode == 200) {
+        prefs.setString("accessToken", response.headers.value("accesstoken") ?? "");
+
+        var refreshtoken = response.headers.value("refreshtoken") ?? "";
+        if(refreshtoken != "") {
+          prefs.setString("refreshToken", response.headers.value("refreshtoken") ?? "");
+        }
+
+        print("accessToken: ${response.headers.value("accesstoken") ?? ""}");
+        print("refreshToken: ${response.headers.value("refreshtoken") ?? ""}");
+      }
+    } on DioError catch (error) {
+      if (error.response != null) {
+        print("error.response.data: ${error.response.data}");
+      } else {
+        print("error.message: ${error.response}");
+      }
+      response = error.response;
+    }
+
+    return response;
+  }
+
 }
+
 
 
 // 토큰 정보 조회
-Future<String> getTokenInfoRequest() async {
-  var dio = Dio();
-  final response = await dio.get(
-      'https://www.usedmoa.co.kr/users/tokenAmount',
-      queryParameters: {'userId': "master"}
-  );
-
-  // shared preferences 에 값 저장
-  final prefs = await SharedPreferences.getInstance();
-  prefs.setString('amount', response.data["amount"]);
-
-  return response.data["amount"];
-}
+// Future<String> getTokenInfoRequest() async {
+//   // shared preferences 에 값 저장
+//   final prefs = await SharedPreferences.getInstance();
+//   var walletAddress = prefs.getString("walletAddress") ?? "";
+//
+//   var dio = Dio();
+//   final response = await dio.get(
+//       'https://www.usedmoa.co.kr/users/tokenAmount',
+//       queryParameters: {'walletAddress': walletAddress}
+//   );
+//
+//   prefs.setString('amount', response.data["amount"]);
+//   return response.data["amount"];
+// }

@@ -10,7 +10,7 @@ const erc1155Abi = JSON.parse(fs.readFileSync('/usr/local/nodejs/abi/erc1155_abi
 const contract = new web3js.eth.Contract(erc1155Abi, process.env.ERC1155_CONTRACT_ADDRESS);
 
 
-// 카카오톡 토큰 체크하는 함수
+// 카카오톡 Access Token 검증 함수
 const kakaoTokenCheck = async (userInfo) => {
   try {
     // 토큰 정보 확인: 액세스 토큰의 유효성을 검증하거나 정보를 확인하는 API
@@ -25,17 +25,11 @@ const kakaoTokenCheck = async (userInfo) => {
         .then((res) => {
           // 결과값 - id : 회원번호, expires_in : 액세스 토큰 만료 시간(초), app_id : 토큰이 발급된 앱 ID
           userInfo.set('id', res.data.id)
-          userInfo.set('expires_in', res.data.expires_in)
-          userInfo.set('app_id', res.data.app_id)
-          // console.log("access_token_info.id: " + res.data.id);
-          // console.log("expires_in: " + res.data.expires_in);
-          // console.log("app_id: " + res.data.app_id);
-
           return userInfo
         })
   } catch (err) {
-    // console.log("tokenCheckError: ", err);
-    userInfo.set('id', 0)
+    // console.log("kakaoTokenError: ", err.response.data);
+    userInfo.set('id', -1)
     return userInfo
   }
 }
@@ -59,15 +53,15 @@ const getUserInfo = async (userInfo) => {
           withCredentials: true,
         },
     ).then((res) => {
-      // console.log("getUserInfo: " + JSON.stringify(res.data));
+      console.log("getUserInfo: " + JSON.stringify(res.data));
       userInfo.set("nickname", res.data.properties.nickname)
       userInfo.set("email" ,res.data.kakao_account.email);
-      // console.log("nickname: " + res.data.properties.nickname);
-      // console.log("email: " + res.data.kakao_account.email);
-
+      console.log("nickname: " + res.data.properties.nickname);
+      console.log("email: " + res.data.kakao_account.email);
       return userInfo
     });
   } catch (err) {
+    // todo - 예외처리
     console.log("getUserInfo - Error: ", err.name);
     return userInfo
   }
@@ -102,7 +96,7 @@ const refreshVerify = async (userInfo) => {
 }
 
 
-// 토큰 결제
+// 경매 물품 결제
 const payment = async (userInfo) => {
   console.log("service - payment 실행");
   // const foundUser = await UserModel.userUpdate(userInfo)
@@ -135,13 +129,45 @@ const payment = async (userInfo) => {
 }
 
 
+// 상품 결제
+const itemPayment = async (userInfo) => {
+  console.log("service - itemPayment 실행");
+
+  console.log("userInfo : ", userInfo);
+
+  // 사용자 정보 조회
+
+  // 토큰 결제
+
+  // 경매 정보 조회
+  // const auctionInfo = await getAuctionInfo(userInfo.get("auctionId"));
+  // console.info("auctionInfo: ",auctionInfo);
+
+
+  // 토큰 정보 조회
+  // const tokenInfo = await getUserTokenInfo(userInfo.get("userAddress"));
+  // console.info("tokenInfo: ",tokenInfo);
+
+
+  // erc1155mint(process.env.ERC1155_CONTRACT_ADDRESS, 0, 2000);
+  // 결제 유저 정보 체크
+  // auctionId, userId
+
+  // 토큰 결제
+  // erc1155Send(userInfo.get("userAddress"), process.env.USER_V1_ADDRESS, 0, userInfo.get("money"))
+  //     .then(function(str) {
+  //       console.log("erc1155Send: ",str);
+  //     });
+}
+
+
 // 토큰 정보 조회
-const tokenAmount = async (userInfo) => {
+const balance = async (userInfo) => {
   console.log("service - tokenAmount 실행");
   // const foundUser = await UserModel.userUpdate(userInfo)
 
   // 경매 정보 조회
-  const tokenInfo = await getUserTokenInfo(userInfo.get("userAddress"));
+  const tokenInfo = await getUserTokenInfo(userInfo.get("walletAddress"));
   console.info("tokenInfo: ",tokenInfo);
 
   return tokenInfo;
@@ -263,6 +289,7 @@ module.exports = {
   findUser,
   userCreate,
   payment,
-  tokenAmount,
+  itemPayment,
+  balance,
   tradeHistory,
 }

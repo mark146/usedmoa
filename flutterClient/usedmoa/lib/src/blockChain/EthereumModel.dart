@@ -25,7 +25,8 @@ String USER3_ADDRESS = dotenv.env['USER3_ADDRESS'];
 
 
 // 이더리움 네트워크에 배포된 ERC-20 코인(UsedMoaToken) Contract 주소 정보
-final EthereumAddress _contractAddress = EthereumAddress.fromHex('0x3a79773d8d0b204f8984afd9927f008a05116d59');
+//final EthereumAddress _contractAddress = EthereumAddress.fromHex('0x3a79773d8d0b204f8984afd9927f008a05116d59');
+final EthereumAddress _contractAddress = EthereumAddress.fromHex('0x61b7dc2E8dfB20ca39d60C2272f21B3Df3583612');
 
 class Ethereum {
   // 싱글턴

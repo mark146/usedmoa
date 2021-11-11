@@ -150,11 +150,10 @@ class _ItemListState extends State<ItemList> {
         headers: {"authorization": "Bearer $accessToken"},
       ),
     );
-
-    print("서버 요청 결과 - data.length: ${response.data["list"].length}");
-    print("서버 요청 결과 - list: ${response.data["list"][0]}");
-    print("서버 요청 결과 - id: ${response.data["list"][0]["id"]}");
-    print("서버 요청 결과 - boardList.length: ${boardList.length}");
+    // print("서버 요청 결과 - data.length: ${response.data["list"].length}");
+    // print("서버 요청 결과 - list: ${response.data["list"][0]}");
+    // print("서버 요청 결과 - id: ${response.data["list"][0]["id"]}");
+    // print("서버 요청 결과 - boardList.length: ${boardList.length}");
 
     setState(() {
       for(int i= 0; i<response.data["list"].length; i++) {

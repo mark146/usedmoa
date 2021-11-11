@@ -1,12 +1,12 @@
+import 'dart:io';
+import 'dart:io' show Platform;
 import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:permission_handler/permission_handler.dart';
-import 'dart:io' show Platform;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:cookie_jar/cookie_jar.dart';
@@ -19,6 +19,7 @@ class ItemRegister extends StatefulWidget {
 
 
 class _ItemRegisterState extends State<ItemRegister> {
+  StreamController<String> uiController = StreamController<String>();
 
   // 텍스트 스타일을 정의
   TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 25.0);
@@ -30,8 +31,6 @@ class _ItemRegisterState extends State<ItemRegister> {
   List<XFile> _imageFileList = [];
 
   SharedPreferences prefs;
-
-  StreamController<String> uiController = StreamController<String>();
   TextEditingController _title;
   TextEditingController _product_name;
   TextEditingController _product_price;
@@ -100,7 +99,8 @@ class _ItemRegisterState extends State<ItemRegister> {
                   SizedBox(width: 5),
                   Text("일반 상품 등록하기",
                       textAlign: TextAlign.center,
-                      style: style.copyWith(color: Colors.black, fontWeight: FontWeight.bold)),
+                      style: style.copyWith(color: Colors.black, fontWeight: FontWeight.bold)
+                  ),
                 ],
               ),
             ],
@@ -404,7 +404,8 @@ class _ItemRegisterState extends State<ItemRegister> {
     try {
       File image = File(_imageFileList[0].path);
 
-      var response = await http.put(Uri.parse(uploadUrl), body: image.readAsBytesSync());
+      var response = await http.put(Uri.parse(uploadUrl),
+          body: image.readAsBytesSync());
       return response.statusCode;
     } catch (e) {
       throw ('Error uploading photo: ${e}');
@@ -422,7 +423,6 @@ class _ItemRegisterState extends State<ItemRegister> {
       String user_id = prefs.getString("user_id") ?? "";
       String accessToken = prefs.getString("accessToken") ?? "";
       String refreshToken = prefs.getString("refreshToken") ?? "";
-
 
       Map<String, dynamic> json = new Map();
       json["user_id"] = user_id;
