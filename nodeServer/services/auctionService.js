@@ -1,5 +1,4 @@
 const dotenv = require('dotenv').config();
-const {auctionModel} = require('../models')
 const AuctionListInfo = require('../dto/auctionListInfo');
 const AuctionInfo = require('../dto/auctionInfo');
 const axios = require("axios");
@@ -31,8 +30,7 @@ const auctionCreate = async (userInfo) => {
     // 경매 시작, 종료 시간 추출 -> dayjs 변경 예정
     const startTime = moment(userInfo.get("auction_start_time"));
     const endTime = moment(userInfo.get("auction_end_time"));
-    console.log("startTime: ",startTime);
-    console.log("endTime: ", endTime);
+    console.log(`startTime: ${startTime}, endTime: ${endTime}`);
 
     // 경매 진행 시간 계산
     const auctionPlayTime = endTime.diff(startTime, "seconds")
@@ -45,22 +43,19 @@ const auctionCreate = async (userInfo) => {
     // 경매 인덱스 정보 조회.
     // TODO - 경매 없을 경우 예외처리
     const auctionId = parseInt(await auctionIdCheck());
-    console.log("auctionId: ",auctionId);
-
-    console.log(`auctionPlayTime: ${auctionPlayTime}, TOKEN_MASTER_ADDRESS : ${process.env.TOKEN_MASTER_ADDRESS}, product_price: ${parseInt(userInfo.get("product_price"))} `);
+    console.log(`auctionId: ${auctionId}, auctionPlayTime: ${auctionPlayTime}, TOKEN_MASTER_ADDRESS : ${process.env.TOKEN_MASTER_ADDRESS}, 
+    product_price: ${parseInt(userInfo.get("product_price"))} `);
     
     // 경매 등록 (경매 진행 시간, 판매자 주소, 초기금액)
     await auctionRegister(auctionPlayTime, process.env.TOKEN_MASTER_ADDRESS, parseInt(userInfo.get("product_price")));
 
     // 경매 정보 조회
-    var auctionInfo = getAuctionInfo(auctionId);
+    const auctionInfo = getAuctionInfo(auctionId);
     if(auctionInfo === undefined) {
         console.log("auctionInfo: undefined");
     } else {
-        console.log("auctionInfo: ",auctionInfo);
-        console.log("auctionStatus: ",auctionInfo.auctionStatus);
-        console.log("highestBidder: ",auctionInfo.highestBidder);
-        console.log("highestBiddingPrice: ",auctionInfo.highestBiddingPrice);
+        console.log(`auctionInfo: ${auctionInfo}, auctionStatus: ${auctionInfo.auctionStatus}, highestBidder: ${auctionInfo.highestBidder}, 
+        highestBiddingPrice: ${auctionInfo.highestBiddingPrice}`);
         const dateString = moment.unix(auctionInfo.auctionEndTime).utc();
         console.log("auctionEndTime: ",dateString);
     }
@@ -412,7 +407,6 @@ const auctionRegister = async (play_time, user_address, product_price) => {
     // ether 단위 정보 - 참고 : https://web3js.readthedocs.io/en/v1.5.2/web3-utils.html?highlight=toHex#tohex
     const amount = web3js.utils.toWei(`${product_price}`, 'wei');
 
-
     // 개인 키로 거래에 서명
     const signedTx  = await web3js.eth.accounts.signTransaction({
         "to": erc1155TokenAddress,  // 거래가 전송되는 계정, 비어 있으면 거래가 계약을 생성
@@ -448,7 +442,6 @@ const sendAuctionBid = async (auctionId, userAdress, price) => {
     // ether 단위 정보 - 참고 : https://web3js.readthedocs.io/en/v1.5.2/web3-utils.html?highlight=toHex#tohex
     const amount = web3js.utils.toWei(`${price}`, 'wei');
 
-
     // 개인 키로 거래에 서명
     const signedTx  = await web3js.eth.accounts.signTransaction({
         "to": erc1155TokenAddress,  // 거래가 전송되는 계정, 비어 있으면 거래가 계약을 생성
@@ -462,6 +455,7 @@ const sendAuctionBid = async (auctionId, userAdress, price) => {
     // 트랜잭션 전송
     await web3js.eth.sendSignedTransaction(signedTx.rawTransaction)
         .once("transactionHash", hash => {
+
             // tx가 pending되는 즉시 etherscan에서 tx진행상태를 보여주는 링크를 제공
             console.info("transactionHash: https://ropsten.etherscan.io/tx/" + hash)
 
@@ -479,7 +473,6 @@ const sendAuctionEnd = async (auctionId) => {
     // 유저 지갑 정보 싸인 처리
     const erc1155TokenAddress = web3js.utils.toChecksumAddress(process.env.ERC1155_CONTRACT_ADDRESS);
     const chainId = await web3js.eth.getChainId();
-
 
     // 개인 키로 거래에 서명
     const signedTx  = await web3js.eth.accounts.signTransaction({

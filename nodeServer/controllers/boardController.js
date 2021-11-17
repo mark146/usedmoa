@@ -1,8 +1,8 @@
 const dotenv = require('dotenv').config();
 const AWS = require("aws-sdk");
 const uuid = require("uuid");
-const {boardService} = require("../services");
-const {auth} = require("../middlewares");
+const { boardService } = require("../services");
+const { auth } = require("../middlewares");
 
 
 AWS.config.update({ region: process.env.Region });
@@ -41,14 +41,12 @@ const boardList = async (req, res, next) => {
 
         // 4. 클라이언트 전달 - 새로 발급한 access token과 원래 있던 refresh token 모두 클라이언트에게 반환합니다.
         res.status(200).json({
-            statusCode : 200,
             list : result,
         })
     } catch (err) {
         console.error("err: ",err);
 
         res.status(500).json({
-            statusCode : 500,
             error: err.message
         });
     }

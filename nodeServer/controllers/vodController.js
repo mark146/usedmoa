@@ -1,6 +1,6 @@
 const dotenv = require('dotenv').config()
-const {VodService} = require('../services')
-const {Auth} = require('../middlewares')
+const {vodService} = require('../services')
+const {auth} = require('../middlewares')
 const AWS = require("aws-sdk");
 const uuid = require("uuid");
 const fs = require('fs');
@@ -34,24 +34,24 @@ const vodList = async (req, res, next) => {
         console.log("vodList 실행: "+req.query.user_id)
 
 
-        // 2. jwt 값 검증
+        // todo - 2. jwt 값 검증
         // await Auth.verifyJWT(accessToken)
 
         // 3. 글 목록 조회
-        const result = await VodService.vodList(userInfo);
+        const result = await vodService.vodList(userInfo);
         console.log(`result: `,result);
 
 
         // 4. 클라이언트 전달 - 새로 발급한 access token과 원래 있던 refresh token 모두 클라이언트에게 반환합니다.
         res.status(200).json({
-            statusCode : 200,
+            // statusCode : 200,
             list : result,
         })
     } catch (err) {
         console.error("err: ",err);
 
         res.status(500).json({
-            statusCode : 500,
+            // statusCode : 500,
             error: err.message
         });
     }
@@ -70,10 +70,10 @@ const vodUpload = async (req, res, next) => {
         const filePath = Array();
         userInfo.set("create_user", req.body.create_user);
         userInfo.set("board_id", req.body.board_id);
-        console.log("vodUpload - req: ",req.body)
-        console.log("vodUpload - url: ",req.body.url)
-        console.log("vodUpload - create_user: ",req.body.create_user)
-        console.log("vodUpload - board_id: ",req.body.board_id)
+        // console.log("vodUpload - req: ",req.body)
+        // console.log("vodUpload - url: ",req.body.url)
+        // console.log("vodUpload - create_user: ",req.body.create_user)
+        // console.log("vodUpload - board_id: ",req.body.board_id)
 
 
         // 파일 경로 수정(문자열 자르기, 합치기)
@@ -112,7 +112,6 @@ const vodUpload = async (req, res, next) => {
                     console.error("s3.upload - err: ",err);
 
                     return res.status(500).json({
-                        statusCode : 500,
                         message: 'vod upload error!'
                     })
                 }
@@ -121,11 +120,10 @@ const vodUpload = async (req, res, next) => {
 
 
                 // 3. 영상통화 내용 저장
-                const response = await VodService.videoCallCreate(userInfo)
+                const response = await vodService.videoCallCreate(userInfo)
                 console.log(`s3 파일 업로드 성공: ${response}`);
 
                 res.status(200).json({
-                    statusCode : 200,
                     message: 's3 파일 업로드 완료!'
                 })
             });
@@ -134,7 +132,6 @@ const vodUpload = async (req, res, next) => {
         console.error("s3 파일 업로드 에러 : ", err);
 
         res.status(500).json({
-            statusCode : 500,
             error: err.message
         });
     }

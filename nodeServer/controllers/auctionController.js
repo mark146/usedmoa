@@ -1,5 +1,5 @@
 const dotenv = require('dotenv').config();
-const {auctionService} = require('../services')
+const { auctionService } = require('../services')
 
 
 // 경매 목록
@@ -22,14 +22,12 @@ const auctionList = async (req, res, next) => {
 
         // 결과값 전송
         res.status(200).json({
-            statusCode : 200,
             auctionList: result,
         })
     } catch (err) {
         console.error("err: ",err);
 
         res.status(500).json({
-            statusCode : 500,
             error: err.message
         });
     }
@@ -59,7 +57,6 @@ const auctionCreate = async (req, res, next) => {
 
         // 결과값 전송
         res.status(200).json({
-            statusCode : 200,
             user_id : userInfo.get("user_id"),
             image_url : userInfo.get("image_url"),
             product_name : userInfo.get("product_name"),
@@ -72,7 +69,6 @@ const auctionCreate = async (req, res, next) => {
         console.error("err: ",err);
 
         res.status(500).json({
-            statusCode : 500,
             error: err.message
         });
     }
@@ -93,14 +89,12 @@ const auctionDetail = async (req, res, next) => {
 
         // 결과값 전송
         res.status(200).json({
-            statusCode : 200,
             auctionInfo : result
         })
     } catch (err) {
         console.error("err: ",err);
 
         res.status(500).json({
-            statusCode : 500,
             error: err.message
         });
     }
@@ -116,7 +110,7 @@ const auctionBid = async (req, res, next) => {
         // console.log("auctionBid - req.body.userId: ", req.body.userId)
         // console.log("auctionBid - req.body.bidPrice: ", req.body.bidPrice)
 
-
+        // todo - 실제 사용자 메타마스크 주소로 처리 예정
         switch (req.body.userId) {
             case "master":
                 userInfo.set("userAddress", process.env.TOKEN_MASTER_ADDRESS);
@@ -138,14 +132,12 @@ const auctionBid = async (req, res, next) => {
 
         // 결과값 전송
         res.status(200).json({
-            statusCode : 200,
             result: result
         })
     } catch (err) {
         console.error("err: ",err);
 
         res.status(500).json({
-            statusCode : 500,
             error: err.message
         });
     }
@@ -168,14 +160,12 @@ const auctionEnd = async (req, res, next) => {
 
         // 결과값 전송
         res.status(200).json({
-            statusCode : 200,
             message: result,
         })
     } catch (err) {
         console.error("err: ",err);
 
         res.status(500).json({
-            statusCode : 500,
             error: err.message
         });
     }

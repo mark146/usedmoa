@@ -2,12 +2,12 @@
 const userService = require('./userService')
 const boardService = require('./boardService')
 const auctionService = require('./auctionService')
-const VodService = require('./vodService')
+const vodService = require('./vodService')
 
 
 module.exports = {
   userService,
   boardService,
   auctionService,
-  VodService,
+  vodService,
 }

@@ -223,7 +223,7 @@ class _SettingState extends State<Setting> {
                             return Padding(
                               padding: const EdgeInsets.all(0.0),
                               child: Text(
-                                snapshot.data+" 원",
+                                "${(snapshot.data ?? 0)} 원",
                                 textAlign: TextAlign.center,
                                 style:  TextStyle(fontSize: 14),
                               ),

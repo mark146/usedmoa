@@ -1,0 +1,20 @@
+{
+  "name": "usedmoa",
+  "version": "1.0.0",
+  "description": "- 서비스 소개\r \t- 블록체인 기반 중고거래 플랫폼 서비스",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mark146/usedmoa.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mark146/usedmoa/issues"
+  },
+  "homepage": "https://github.com/mark146/usedmoa#readme"
+}

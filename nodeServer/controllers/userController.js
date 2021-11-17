@@ -1,6 +1,6 @@
 const dotenv = require('dotenv').config()
-const {userService} = require('../services')
-const {auth} = require('../middlewares')
+const { userService } = require('../services')
+const { auth } = require('../middlewares')
 require('date-utils')
 
 
@@ -27,7 +27,6 @@ const login = async (req, res, next) => {
       // 3. id 값이 -1 일 경우 엑세스 토큰 에러
       if (userInfo.get("id") == -1) {
         return res.status(401).json({
-          statusCode : 401,
           error: 'Auth Error from accessToken'
         });
       } else {
@@ -68,7 +67,6 @@ const login = async (req, res, next) => {
         res.setHeader("accessToken", userInfo.get("accessToken"))
         res.setHeader("refreshToken", userInfo.get("refreshToken"))
         res.status(200).json({
-          statusCode : 200,
           email: userInfo.get("email"),
           user_id: userInfo.get("user_id"),
           walletAddress: walletAddress,
@@ -77,7 +75,6 @@ const login = async (req, res, next) => {
       }
     } else {
       res.status(401).json({
-        statusCode : 401,
         error: 'Auth Error from authorization'
       });
     }
@@ -85,7 +82,6 @@ const login = async (req, res, next) => {
     console.error("err: ",err);
 
     res.status(500).json({
-      statusCode : 500,
       error: err.message
     });
   }
@@ -115,8 +111,8 @@ const refresh = async (req, res, next) => {
       // 2. 토큰 검증
       let accessToken = await auth.verify(userInfo);
       let refreshToken = await auth.refreshVerify(userInfo);
-      console.log("accessToken: ",accessToken);
-      console.log("refreshToken: ",refreshToken);
+      // console.log("accessToken: ",accessToken);
+      // console.log("refreshToken: ",refreshToken);
 
 
       // 엑세스 토큰 체크
@@ -135,7 +131,6 @@ const refresh = async (req, res, next) => {
               // 회원이 아닐 경우 에러 처리
               if(userInfo.get("user_id") === undefined) {
                 return res.status(401).json({
-                  statusCode : 401,
                   error: 'Auth Error from authorization'
                 })
               } else {
@@ -152,7 +147,6 @@ const refresh = async (req, res, next) => {
                 res.setHeader("accessToken", userInfo.get("accessToken"))
                 res.setHeader("refreshToken", userInfo.get("refreshToken"))
                 return res.status(200).json({
-                  statusCode : 200,
                   message: 'Token 재발급 완료',
                 })
               }
@@ -167,7 +161,6 @@ const refresh = async (req, res, next) => {
               // 회원이 아닐 경우 에러 처리
               if(userInfo.get("user_id") === undefined) {
                 return res.status(401).json({
-                  statusCode : 401,
                   error: 'Auth Error from authorization'
                 })
               } else {
@@ -177,7 +170,6 @@ const refresh = async (req, res, next) => {
 
                 res.setHeader("accessToken", userInfo.get("accessToken"))
                 return res.status(200).json({
-                  statusCode : 200,
                   message: '액세스 토큰 재발급 완료',
                 })
               }
@@ -185,19 +177,16 @@ const refresh = async (req, res, next) => {
           break;
         case undefined :
           res.status(200).json({
-            statusCode : 200,
             message: '엑세스 토큰 기간이 유효합니다.'
           });
           break;
         default: // todo - 다른 에러 처리
           res.status(401).json({
-            statusCode : 401,
             error: 'Auth Error from authorization'
           });
       }
     } else {
       res.status(401).json({
-        statusCode : 401,
         error: 'Auth Error from authorization'
       });
     }
@@ -205,7 +194,6 @@ const refresh = async (req, res, next) => {
     console.error("err: ",err);
 
     res.status(500).json({
-      statusCode : 500,
       error: err.message
     });
   }
@@ -220,7 +208,7 @@ const payment = async (req, res, next) => {
     userInfo.set("auctionId", req.body.auctionId);
     userInfo.set("money", req.body.money);
 
-
+    // todo - 실제 사용자 메타마스크 주소로 처리 예정
     switch (req.body.userId) {
       case "master":
         userInfo.set("userAddress", process.env.TOKEN_MASTER_ADDRESS);
@@ -236,17 +224,16 @@ const payment = async (req, res, next) => {
     }
     console.log("userInfo: ", userInfo)
 
+    // 비즈니스 로직 처리
     await userService.payment(userInfo);
 
     res.status(200).json({
-      statusCode : 200,
       message: 'payment 실행 완료',
     })
   } catch (err) {
     console.error("err: ",err);
 
     res.status(500).json({
-      statusCode : 500,
       error: err.message
     });
   }
@@ -271,7 +258,7 @@ const itemPayment = async (req, res, next) => {
       console.log("board_id: " + userInfo.get("board_id"));
 
 
-      // 엑세스 토큰 검증
+      // todo - 엑세스 토큰 검증
 
 
       // 비즈니스 로직 처리
@@ -279,12 +266,10 @@ const itemPayment = async (req, res, next) => {
 
       // 클라이언트 전달 - 새로 발급한 access token과 원래 있던 refresh token 모두 클라이언트에게 반환합니다.
       res.status(200).json({
-        statusCode : 200,
-        "message": "상품 결제가 완료되었습니다.",
+        "message": "상품 결제가 완료되었습니다."
       })
     } else {
       res.status(401).json({
-        statusCode : 401,
         error: 'Auth Error from authorization'
       });
     }
@@ -292,7 +277,6 @@ const itemPayment = async (req, res, next) => {
     console.error("err: ",err);
 
     res.status(500).json({
-      statusCode : 500,
       error: err.message
     });
   }
@@ -317,15 +301,16 @@ const balance = async (req, res, next) => {
       // 토큰 값이 만료되거나 이상할 경우 에러값 전달
       if (isAccessToken == "TokenExpiredError" || isAccessToken == "JsonWebTokenError") {
         return res.status(401).json({
-          statusCode : 401,
           error: 'Auth Error from accessToken'
         });
       } else {
         userInfo.set("walletAddress", req.query.walletAddress);
         console.log("walletAddress: ", userInfo.get("walletAddress"));
+
+        // 비즈니스 로직 실행
         const result = await userService.balance(userInfo)
+
         res.status(200).json({
-          statusCode : 200,
           amount : result
         })
       }
@@ -334,20 +319,20 @@ const balance = async (req, res, next) => {
     console.error("err: ",err);
 
     res.status(500).json({
-      statusCode : 500,
       error: err.message
     });
   }
 }
 
 
-// 유저 거래내역 조회
+// todo - 유저 거래내역 조회 (미완성)
 const tradeHistory = async (req, res, next) => {
   try {
     let accessToken = "";
     let userInfo = new Map();
 
 
+    // todo - 실제 사용자 메타마스크 주소로 처리 예정
     switch (req.query.userId) {
       case "master":
         userInfo.set("userAddress", process.env.TOKEN_MASTER_ADDRESS);
@@ -363,19 +348,16 @@ const tradeHistory = async (req, res, next) => {
     }
     console.log("userInfo: ", userInfo)
 
-
+    // 비즈니스 로직 실행
     const result = await userService.tradeHistory(userInfo);
 
-
     res.status(200).json({
-      statusCode : 200,
       historyList : result
     })
   } catch (err) {
     console.error("err: ",err);
 
     res.status(500).json({
-      statusCode : 500,
       error: err.message
     });
   }

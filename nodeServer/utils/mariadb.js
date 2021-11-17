@@ -19,11 +19,11 @@ const getConnection = () => {
     return new Promise(function (resolve, reject) {
         pool.getConnection()
             .then(function (connection) {
-                console.log("MariaDB pool connected: threadId " + connection.threadId);
+                console.log(`MariaDB pool connected: threadId: ${connection.threadId}`);
                 resolve(connection);
             })
             .catch(function (error) {
-                console.log("MariaDB pool error: " + error);
+                console.log(`MariaDB pool error: ${error}`);
                 reject(error);
             });
     });

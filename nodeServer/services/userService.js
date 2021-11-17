@@ -1,4 +1,4 @@
-const { UserModel } = require('../models')
+const { userModel } = require('../models')
 const axios = require("axios");
 const dotenv = require('dotenv').config();
 const Web3 = require('web3');
@@ -56,8 +56,8 @@ const getUserInfo = async (userInfo) => {
       console.log("getUserInfo: " + JSON.stringify(res.data));
       userInfo.set("nickname", res.data.properties.nickname)
       userInfo.set("email" ,res.data.kakao_account.email);
-      console.log("nickname: " + res.data.properties.nickname);
-      console.log("email: " + res.data.kakao_account.email);
+      // console.log("nickname: " + res.data.properties.nickname);
+      // console.log("email: " + res.data.kakao_account.email);
       return userInfo
     });
   } catch (err) {
@@ -70,28 +70,28 @@ const getUserInfo = async (userInfo) => {
 
 // 유저 정보 수정
 const userUpdate = async (userInfo) => {
-  const foundUser = await UserModel.userUpdate(userInfo)
+  const foundUser = await userModel.userUpdate(userInfo)
   return foundUser
 }
 
 
 // 유저 정보 조회
 const findUser = async (userInfo) => {
-  const foundUser = await UserModel.findUser(userInfo)
+  const foundUser = await userModel.findUser(userInfo)
   return foundUser
 }
 
 
 // 유저 정보 생성
 const userCreate = async (userInfo) => {
-  const foundUser = await UserModel.userCreate(userInfo)
+  const foundUser = await userModel.userCreate(userInfo)
   return foundUser
 }
 
 
 // 유저 리프레시 토큰 정보 조회
 const refreshVerify = async (userInfo) => {
-  const refreshVerify = await UserModel.refreshVerify(userInfo)
+  const refreshVerify = await userModel.refreshVerify(userInfo)
   return refreshVerify
 }
 
@@ -99,7 +99,7 @@ const refreshVerify = async (userInfo) => {
 // 경매 물품 결제
 const payment = async (userInfo) => {
   console.log("service - payment 실행");
-  // const foundUser = await UserModel.userUpdate(userInfo)
+  // const foundUser = await userModel.userUpdate(userInfo)
 
 
   // 경매 인덱스
@@ -132,7 +132,6 @@ const payment = async (userInfo) => {
 // 상품 결제
 const itemPayment = async (userInfo) => {
   console.log("service - itemPayment 실행");
-
   console.log("userInfo : ", userInfo);
 
   // 사용자 정보 조회
@@ -164,7 +163,7 @@ const itemPayment = async (userInfo) => {
 // 토큰 정보 조회
 const balance = async (userInfo) => {
   console.log("service - tokenAmount 실행");
-  // const foundUser = await UserModel.userUpdate(userInfo)
+  // const foundUser = await userModel.userUpdate(userInfo)
 
   // 경매 정보 조회
   const tokenInfo = await getUserTokenInfo(userInfo.get("walletAddress"));
@@ -177,7 +176,7 @@ const balance = async (userInfo) => {
 // 거래내역 조회
 const tradeHistory = async (userInfo) => {
   console.log("service - tradeHistory 실행");
-  // const foundUser = await UserModel.userUpdate(userInfo)
+  // const foundUser = await userModel.userUpdate(userInfo)
 
   // 경매 정보 조회
   const history = await getTradeHistory(userInfo.get("userAddress"));
